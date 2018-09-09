@@ -1,0 +1,436 @@
+swagger: '2.0'
+info:
+  description: API para el app server de Comprame
+  title: Comprame - App Server API
+  version: 1.0.0
+host: Comprame.7552.fi.uba.ar
+schemes:
+  - http
+basePath: /api
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  BusinessToken:
+    type: apiKey
+    in: query
+    name: token
+  ApplicationToken:
+    type: apiKey
+    in: query
+    name: token
+tags:
+  - name: user
+    description: |
+      Llamados relacionados con autenticación de usuarios
+  - name: profile
+    description: |
+      Llamados relacionados con perfiles
+
+paths:
+  /login:
+    post:
+      tags:
+        - user
+      description: "Endpoint para logearse en la aplicación"
+      parameters:
+        - description: "Datos para logearse"
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ApplicationLoginCredentials'
+      responses:
+        201:
+          description: "Login exitoso"
+          schema:
+            properties:
+              token:
+                $ref: "#/definitions/Token"
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: "Generar token de usuario"
+  /signup:
+    post:
+      tags:
+        - user
+      description: |
+        Endpoint para dar de alta un usuario.
+      parameters:
+        - description: "Datos para dar de alta un usuario"
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/UserData"
+      responses:
+        201:
+          description: "Alta correcta"
+          schema:
+            properties:
+              token:
+                $ref: '#/definitions/Token'
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: "Dar de un application server"
+  /users/{serverId}:
+    parameters:
+      - description: "Perfil de usuario"
+        in: path
+        name: serverId
+        required: true
+        type: string
+    get:
+      tags:
+        - profile
+      description: "Devuelve toda la información del perfil del usuario"
+      responses:
+        200:
+          description: "Información del usuario"
+          schema:
+            properties:
+              user:
+                $ref: "#/definitions/User"
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        404:
+          description: "Usuario inexistente"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: "Obtener información de un usuario"
+    put:
+      tags:
+        - profile
+      description: |
+        Endpoint para editar el perfil del usuario.
+      parameters:
+        - description: Datos para modificar el perfil del usuario
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        201:
+          description: "Edición de perfil exitosa"
+          schema:
+            properties:
+              user:
+                $ref: '#/definitions/User'
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "No existe el usuario solicitado"
+          schema:
+            $ref: "#/definitions/Error"
+        409:
+          description: "Conflicto en el update"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+      summary: "Resetear un token de un servidor"
+  /chat/{userId}:
+    parameters:
+      - description: "Servicio de chat entre comprador y vendedor"
+        in: path
+        name: userId
+        required: true
+        type: string
+    post:
+      tags:
+        - messages
+      description: |
+        Enviar nuevo mensaje al chat
+      parameters:
+        - description: Mensaje a enviar
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/Message"
+      responses:
+        200:
+          description: "Envio del mensaje exitoso"
+          schema:
+            properties:
+              chat:
+                $ref: '#/definitions/Chat'
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        404:
+          description: "Usuario inexistente"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+    get:
+      tags:
+        - messages
+      description: |
+        Recibir mensajes en el chat
+      responses:
+        200:
+          description: "Recibo del mensaje exitoso"
+          schema:
+            properties:
+              chat:
+                $ref: '#/definitions/Chat'
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        404:
+          description: "Usuario inexistente"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+  /publish:
+    post:
+      tags:
+        - articles
+      description: |
+        Publicar un nuevo articulo
+      parameters:
+        - description: Articulo a publicar
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/Article"
+      responses:
+        200:
+          description: "Publicacion exitosa"
+          schema:
+            properties:
+              QRcode:
+                $ref: '#/definitions/QRcode'
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        404:
+          description: "Usuario inexistente"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+  /question/{articleId}:
+    parameters:
+      - description: "Servicio de alta de pregunta"
+        in: path
+        name: articleId
+        required: true
+        type: string
+    post:
+      tags:
+        - articles
+      description: |
+        Publicar una pregunta acerca de un articulo
+      parameters:
+        - description: Pregunta a publicar en el anuncio del articulo
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/Question"
+      responses:
+        200:
+          description: "Publicacion de la pregunta exitosa"
+          properties:
+            questionId:
+              type: string
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        404:
+          description: "Usuario inexistente"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+  /answer/{questionId}:
+    parameters:
+      - description: "Id de la pregunta a la que se responde"
+        in: path
+        name: questionId
+        required: true
+        type: string
+    post:
+      tags:
+        - articles
+      description: |
+        Publicar una respuesta a una pregunta acerca de un articulo
+      parameters:
+        - description: Respuesta a la pregunta publicada
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/Answer"
+      responses:
+        200:
+          description: "Publicacion de la respuesta exitosa"
+          schema:
+            properties:
+              answer:
+                $ref: '#/definitions/Answer'
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        404:
+          description: "Usuario inexistente"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+
+definitions:
+  Version:
+    type: string
+    description: Versión de la api
+  Ref:
+    type: string
+    description: |
+      Hash que es utilizado para prevenir colosiones.
+      Cuando se crea un elemento, se debe pasar un valor de undefined (o no debe estar).
+      Al actualizar, el servidor chequeará que este valor sea igual al guardado, de no coincidir,
+      significa que otro actualizó el recurso, por ende, la actualización debe fallar.
+  Error:
+    properties:
+      code:
+        format: int32
+        type: integer
+      message:
+        type: string
+    type: object
+  Token:
+    properties:
+      token:
+        type: string
+        description: Token de autenticación
+  ApplicationLoginCredentials:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+        format: password
+  UserData:
+    properties:
+      personalInformation:
+        $ref: '#/definitions/PersonalInformation'
+      password:
+        type: string
+        format: password
+  User:
+    properties:
+      personalInformation:
+        $ref: '#/definitions/PersonalInformation'
+      profilePicture:
+        type: object
+      activities:
+       $ref: '#/definitions/Activities'
+  PersonalInformation:
+    properties:
+      name:
+        type: string
+      surname:
+        type: string
+      email:
+        type: string
+  Activities:
+    properties:
+      activities:
+        type: object
+  Message:
+    properties:
+      message:
+        type: string
+  Chat:
+    properties:
+      messages:
+        type: object
+  Article:
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      stock:
+        type: integer
+      price:
+        type: number
+      images:
+        type: object
+      userId:
+        type: integer
+      location:
+        $ref: '#/definitions/Location'
+      paymentMethods:
+        type: object
+      category:
+        type: string
+  QRcode:
+    properties:
+      code:
+        type: object
+  Question:
+    properties:
+      message:
+        type: string
+  Answer:
+    properties:
+      message:
+        type: string
+  Location:
+    description: |
+      Las coordenadas utilizan la especificación de [GeoJSON](https://geojson.org/geojson-spec.html#coordinate-reference-system-objects)
+      donde `lon` es el primer número, mientras `lat` el segundo
+    properties:
+      lat:
+        type: number
+      lon:
+        type: number
