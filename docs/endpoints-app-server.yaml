@@ -11,15 +11,6 @@ consumes:
   - application/json
 produces:
   - application/json
-securityDefinitions:
-  BusinessToken:
-    type: apiKey
-    in: query
-    name: token
-  ApplicationToken:
-    type: apiKey
-    in: query
-    name: token
 tags:
   - name: user
     description: |
@@ -27,6 +18,12 @@ tags:
   - name: profile
     description: |
       Llamados relacionados con perfiles
+  - name: articles
+    description: |
+      Llamados relacionados con artìculos
+  - name: tracking
+    description: |
+      Llamados relacionados con tracking de compras
 
 paths:
   /login:
@@ -273,9 +270,10 @@ paths:
       responses:
         200:
           description: "Publicacion de la pregunta exitosa"
-          properties:
-            questionId:
-              type: string
+          schema:
+            properties:
+              questionId:
+                type: string
         401:
           description: Unauthorized
           schema:
@@ -326,18 +324,248 @@ paths:
           description: "Unexpected error"
           schema:
             $ref: "#/definitions/Error"
+  /purchase/{articleId}:
+    parameters:
+      - description: "Id del artìculo que se quiere comprar"
+        in: path
+        name: articleId
+        required: true
+        type: string
+    post:
+      tags:
+        - articles
+      description: |
+        Comprar un artìculo
+      parameters:
+        - description: Método de compra
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/PaymentMethod"
+      responses:
+        200:
+          description: "Compra exitosa"
+          schema:
+            properties:
+              answer:
+                $ref: '#/definitions/Purchase'
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        404:
+          description: "Artículo inexistente"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+  /track/{trackingId}:
+    parameters:
+      - description: "Id de tracking del artículo comprado"
+        in: path
+        name: trackingId
+        required: true
+        type: string
+    get:
+      tags:
+        - tracking
+      description: |
+        Trackear un artículo comprado
+      responses:
+        200:
+          description: "Estado de la compra trackeado"
+          schema:
+            properties:
+              answer:
+                $ref: '#/definitions/State'
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        404:
+          description: "Compra inexistente"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+  /search/{location}:
+    parameters:
+      - description: "Ubicación en la que se quiere buscar artículos"
+        in: path
+        name: location
+        required: true
+        type: string
+    get:
+      tags:
+        - articles
+      description: |
+        Buscar un artículo por ubicación
+      responses:
+        200:
+          description: "Búsqueda de artículos cercanos exitosa"
+          schema:
+            properties:
+              answer:
+                $ref: '#/definitions/Articles'
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+  /search/{name}:
+    parameters:
+      - description: "Nombre por el que se quiere buscar artículos"
+        in: path
+        name: name
+        required: true
+        type: string
+    get:
+      tags:
+        - articles
+      description: |
+        Buscar un artículo por nombre
+      responses:
+        200:
+          description: "Búsqueda de artículos por nombre exitosa"
+          schema:
+            properties:
+              answer:
+                $ref: '#/definitions/Articles'
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+  /search/{description}:
+    parameters:
+      - description: "Descripción por la que se quiere buscar artículos"
+        in: path
+        name: description
+        required: true
+        type: string
+    get:
+      tags:
+        - articles
+      description: |
+        Buscar un artículo por descripción
+      responses:
+        200:
+          description: "Búsqueda de artículos por descripción exitosa"
+          schema:
+            properties:
+              answer:
+                $ref: '#/definitions/Articles'
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+  /{articleId}/delivery/{location}:
+    parameters:
+      - description: "Id del artículo de envío"
+        in: path
+        name: articleId
+        required: true
+        type: string
+      - description: "Ubicaciòn por la que se quiere cotizr el envío"
+        in: path
+        name: location
+        required: true
+        type: string
+    get:
+      tags:
+        - articles
+      description: |
+        Cotizar el envío de un artículo a la ubicación deseada
+      responses:
+        200:
+          description: "Cotización exitosa"
+          schema:
+            properties:
+              price:
+                type: number
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+  /ping:
+    get:
+      description: |
+        Determinar el estado del servidor
+      responses:
+        200:
+          description: "Servidor activo"
+          schema:
+            properties:
+              pong:
+                type: string
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+  /stats:
+    get:
+      description: |
+        Datos del uso del servidor
+      responses:
+        200:
+          description: "Obtenciòn de datos exitosa"
+          schema:
+            $ref: "#/definitions/ServerStats"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+  /score/{userId}:
+    parameters:
+      - description: "Id del usuario por el que se consulta el puntaje"
+        in: path
+        name: userId
+        required: true
+        type: string
+    get:
+      tags:
+        - articles
+      description: |
+        Obtener el puntaje de un usuario
+      responses:
+        200:
+          description: "Obtención de puntaje exitosa"
+          schema:
+            properties:
+              answer:
+                $ref: '#/definitions/Score'
+        401:
+          description: Unauthorized
+          schema:
+              $ref: '#/definitions/Error'
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
 
 definitions:
   Version:
     type: string
     description: Versión de la api
-  Ref:
-    type: string
-    description: |
-      Hash que es utilizado para prevenir colosiones.
-      Cuando se crea un elemento, se debe pasar un valor de undefined (o no debe estar).
-      Al actualizar, el servidor chequeará que este valor sea igual al guardado, de no coincidir,
-      significa que otro actualizó el recurso, por ende, la actualización debe fallar.
   Error:
     properties:
       code:
@@ -433,4 +661,46 @@ definitions:
       lat:
         type: number
       lon:
+        type: number
+  PaymentMethod:
+    description: Método de pago
+    properties:
+      method:
+        type: string
+      card:
+        type: string
+      authorization:
+        type: string
+  Purchase:
+    description: Compra
+    properties:
+      purchaseId:
+        type: string
+      articleId:
+        type: string
+      trackingId:
+        type: string
+  State:
+    description: Estado del artículo comprado
+    properties:
+      stateId:
+        type: string
+      stateDescription:
+        type: string
+  Articles:
+    description: Conjunto de artículos publicados
+    properties:
+      articles:
+        type: object
+  ServerStats:
+    description: Datos de uso del servidor
+    properties:
+      status:
+        type: string
+      serverUsage:
+        type: number
+  Score:
+    description: Puntaje del usuario
+    properties:
+      score:
         type: number
