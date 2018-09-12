@@ -1,0 +1,7 @@
+docs
+.git
+.gitignore
+.travis.yml
+.coverage
+Procfile
+README.md
