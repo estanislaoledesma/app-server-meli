@@ -72,7 +72,7 @@ paths:
           schema:
             $ref: "#/definitions/UserData"
       responses:
-        201:
+        200:
           description: "Alta correcta"
           schema:
             properties:
