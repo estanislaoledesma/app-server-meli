@@ -1,8 +1,9 @@
 from flask_restful import Resource, Api
-from flask import Response
+from flask import Response, json, jsonify
 
 class HelloWorld(Resource):
 
     def get(self):
-        response = Response("Hola Mundo", status = 200, mimetype = 'application/json')
+        msg = json.dumps("Hola Mundo")
+        response = Response(msg, status = 200, mimetype = 'application/json')
         return response
