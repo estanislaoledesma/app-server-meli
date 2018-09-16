@@ -17,7 +17,8 @@ class Sign_Up(Resource):
                     password = password,
                     display_name = display_name,
                     disabled = False)
-            return Response(jsonify(user), status = 200, mimetype = 'application/json')
+            body = json.dumps(user)
+            return Response(body, status = 200, mimetype = 'application/json')
         except ValueError:
             return Response('Parametros faltantes/erroneos', status = 400, mimetype = 'text/html')
         except auth.AuthError:
