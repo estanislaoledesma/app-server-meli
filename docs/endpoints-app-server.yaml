@@ -87,7 +87,7 @@ paths:
           schema:
             $ref: "#/definitions/Error"
       summary: "Dar de un application server"
-  /users/{serverId}:
+  /users/{userId}:
     parameters:
       - description: "Perfil de usuario"
         in: path
@@ -248,7 +248,7 @@ paths:
           description: "Unexpected error"
           schema:
             $ref: "#/definitions/Error"
-  /question/{articleId}:
+  /articles/{articleId}/questions:
     parameters:
       - description: "Servicio de alta de pregunta"
         in: path
@@ -393,7 +393,7 @@ paths:
           description: "Unexpected error"
           schema:
             $ref: "#/definitions/Error"
-  /search/{location}:
+  /search?{location}:
     parameters:
       - description: "Ubicación en la que se quiere buscar artículos"
         in: path
@@ -428,8 +428,6 @@ paths:
         required: true
         type: string
     get:
-      tags:
-        - articles
       description: |
         Buscar un artículo por nombre
       responses:
@@ -598,7 +596,7 @@ definitions:
       personalInformation:
         $ref: '#/definitions/PersonalInformation'
       profilePicture:
-        type: object
+        type: url
       activities:
        $ref: '#/definitions/Activities'
   PersonalInformation:
