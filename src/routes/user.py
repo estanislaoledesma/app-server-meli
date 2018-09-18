@@ -5,6 +5,9 @@ from flask import Response, request, jsonify
 
 class Sign_Up(Resource):
 
+    def __init__(self, **kwargs):
+        self.logger = kwargs.get('logger')
+
     def post(self):
         try:
             json_data = request.get_json(force=True)
