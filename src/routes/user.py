@@ -1,7 +1,7 @@
 import firebase_admin
 from firebase_admin import auth
 from flask_restful import Api, Resource
-from flask import Response, request, jsonify
+from flask import Response, request, jsonify, json
 
 class Sign_Up(Resource):
 
@@ -20,9 +20,34 @@ class Sign_Up(Resource):
                     password = password,
                     display_name = display_name,
                     disabled = False)
-            body = json.dumps(user)
-            return Response(body, status = 200, mimetype = 'application/json')
+#             body = json.dumps(user)
+            return Response('User created with uid: '+user.uid, status = 200, mimetype = 'text/html')
         except ValueError:
             return Response('Parametros faltantes/erroneos', status = 400, mimetype = 'text/html')
         except auth.AuthError:
             return Response('Error al generar el usuario', status = 500, mimetype = 'text/html')
+
+# 
+# class Login(Resource): TO DO
+# 
+#     def __init__(self, **kwargs):
+#         self.logger = kwargs.get('logger')
+# 
+#     def post(self):
+#         try:
+#             json_data = request.get_json(force=True)
+#             email = json_data['email']
+#             password = json_data['password']
+#             user = auth.create_user(
+#                     email = email,
+#                     email_verified = False,
+#                     password = password,
+#                     display_name = display_name,
+#                     disabled = False)
+#             body = json.dumps(user)
+#             return Response(body, status = 200, mimetype = 'application/json')
+#         except ValueError:
+#             return Response('Parametros faltantes/erroneos', status = 400, mimetype = 'text/html')
+#         except auth.AuthError:
+#             return Response('Error al generar el usuario', status = 500, mimetype = 'text/html')
+
