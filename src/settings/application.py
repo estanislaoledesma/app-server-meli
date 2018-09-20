@@ -25,3 +25,4 @@ if __name__ != '__main__':
 
 api.add_resource(hello.HelloWorld, '/', resource_class_kwargs={'logger': app.logger})
 api.add_resource(user.Sign_Up, '/signup', resource_class_kwargs={'logger': app.logger})
+api.add_resource(user.Login, '/login', resource_class_kwargs={'logger': app.logger})
