@@ -1,7 +1,7 @@
 import firebase_admin
 from firebase_admin import auth
 from flask_restful import Api, Resource
-from flask import Response, request, jsonify, json
+from flask import Response, request, jsonify, json, redirect, url_for
 import pyrebase
 from ..settings import application
 
@@ -50,6 +50,7 @@ class Login(Resource):
             return Response(body, status=400, mimetype='application/json')
 
         body = json.dumps("Welcome back "+user['email']+'and token: '+user['idToken'])
-        return Response(body, status=200, mimetype='application/json')
+#         return Response(body, status=200, mimetype='application/json')
+        return redirect(url_for('hello'))
         
 
