@@ -7,6 +7,7 @@ from firebase_admin import credentials
 from . import config
 import logging
 from logging.handlers import RotatingFileHandler
+import pyrebase
 
 app = Flask(__name__)
 api = Api(app)
@@ -16,6 +17,8 @@ ma = Marshmallow(app)
 conf = config.Config()
 cred = credentials.Certificate(conf.get_fb_credentials())
 fb_app = firebase_admin.initialize_app(cred)
+firebase = pyrebase.initialize_app(conf.get_websetup())
+
 
 # Configuracion del logger
 if __name__ != '__main__':
