@@ -12,7 +12,7 @@ class Sign_Up(Resource):
 
     def post(self):
 
-        try:
+#        try:
             json_data = request.get_json(force=True)
             self.logger.info(json_data)
             email = json_data['email']
@@ -24,9 +24,9 @@ class Sign_Up(Resource):
             user = auth.create_user_with_email_and_password(email, password)
             return jsonify(code=config.Config.CODE_OK, token=user['idToken'])
 
-        except pyrebase.pyrebase.HTTPError:
-            error = error_handler.Error_Handler(config.Config.CODE_BAD_REQUEST, 'Datos incorrectos. Intente de nuevo.')
-            return error.getErrorResponse()
+#        except pyrebase.pyrebase.HTTPError:
+#            error = error_handler.Error_Handler(config.Config.CODE_BAD_REQUEST, 'Datos incorrectos. Intente de nuevo.')
+#            return error.getErrorResponse()
 
  
 class Login(Resource):
