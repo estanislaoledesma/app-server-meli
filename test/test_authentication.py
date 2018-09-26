@@ -18,7 +18,7 @@ class Test_Authetication(TestCase):
 
     def test_hello_world(self):
         resultado = self.app.get('/')
-        assert resultado.data.get_json ['Hello'] == 'World'
+        assert resultado.get_json ['Hello'] == 'World'
 
     def test_sign_up(self):
         email = 'test@domain.com'
