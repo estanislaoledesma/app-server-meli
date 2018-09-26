@@ -2,11 +2,8 @@ from flask import Flask
 from flask_restful import Api
 from flask_marshmallow import Marshmallow
 from src.routes import hello, user
-import firebase_admin
-from firebase_admin import credentials
 from .config import Config
 import logging
-from logging.handlers import RotatingFileHandler
 import pyrebase
 
 app = Flask(__name__)

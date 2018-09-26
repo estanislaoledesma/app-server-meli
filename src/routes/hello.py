@@ -1,5 +1,6 @@
-from flask_restful import Resource, Api
-from flask import Response, json, jsonify
+from flask_restful import Resource
+from flask import jsonify
+from ..settings import config, response_handler
 
 class HelloWorld(Resource):
 
@@ -7,7 +8,6 @@ class HelloWorld(Resource):
         self.logger = kwargs.get('logger')
 
     def get(self):
-        body = json.dumps("Hola Mundo")
-        self.logger.info('Hola Mundo')
-        response = Response(body, status = 200, mimetype = 'application/json')
-        return response
+        response_data = {'Hello': 'World'}
+        response = response_handler.Response_Handler(config.Config.CODE_OK, response_data)
+        return response.getResponse()
