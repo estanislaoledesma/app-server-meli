@@ -47,12 +47,12 @@ class Login(Resource):
 
             response_data = {'token': user['idToken']}
             response = response_handler.Response_Handler(config.Config.CODE_OK, response_data)
-#           return response.getResponse()
+            return response.getResponse()
 
-        except pyrebase.HTTPError:
-            error = error_handler.Error_Handler(config.Config.CODE_BAD_REQUEST, 'Datos incorrectos. Intente de nuevo.')
+        except pyrebase.HTTPError as e:
+            error = error_handler.Error_Handler(config.Config.CODE_BAD_REQUEST, 'Datos incorrectos. Intente de nuevo. Detalles: ' + e)
             return error.getErrorResponse()
 
-        return redirect(url_for('hello'))
+        # return redirect(url_for('hello'))
         
 

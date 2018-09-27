@@ -17,11 +17,11 @@ class Test_Authetication(TestCase):
         pass
 
     def test_hello_world(self):
-        resultado = self.app.get('/')
-        assert resultado.get_json ['Hello'] == 'World'
+        resultado = self.app.get('/)
+        assert resultado.get_json(force=True) ['Hello'] == 'World'
 
     def test_sign_up(self):
         email = 'test@domain.com'
         password = 'password'
         resultado = self.app.post('/signup', data = dict(email = email, password = password), follow_redirects = True)
-        #assert resultado.get_json(force=True) ['code'] == Config.CODE_OK
+        assert resultado.get_json(force=True) ['code'] == Config.CODE_OK
