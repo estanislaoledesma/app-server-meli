@@ -20,6 +20,6 @@ if __name__ != '__main__':
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 
-api.add_resource(hello.HelloWorld, '/', resource_class_kwargs={'logger': app.logger, 'firebase': firebase}, endpoint='hello')
+api.add_resource(hello.HelloWorld, '/', resource_class_kwargs={'logger': app.logger, 'firebase': firebase})
 api.add_resource(user.Sign_Up, '/signup', resource_class_kwargs={'logger': app.logger, 'firebase': firebase})
 api.add_resource(user.Login, '/login', resource_class_kwargs={'logger': app.logger, 'firebase': firebase})

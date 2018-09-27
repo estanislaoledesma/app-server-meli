@@ -11,25 +11,9 @@ consumes:
   - application/json
 produces:
   - application/json
-tags:
-  - name: user
-    description: |
-      Llamados relacionados con autenticación de usuarios
-  - name: profile
-    description: |
-      Llamados relacionados con perfiles
-  - name: articles
-    description: |
-      Llamados relacionados con artìculos
-  - name: tracking
-    description: |
-      Llamados relacionados con tracking de compras
-
 paths:
   /login:
     post:
-      tags:
-        - user
       description: "Endpoint para logearse en la aplicación"
       parameters:
         - description: "Datos para logearse"
@@ -39,7 +23,7 @@ paths:
           schema:
             $ref: '#/definitions/ApplicationLoginCredentials'
       responses:
-        201:
+        200:
           description: "Login exitoso"
           schema:
             properties:
@@ -49,10 +33,6 @@ paths:
           description: "Incumplimiento de precondiciones (parámetros faltantes)"
           schema:
             $ref: "#/definitions/Error"
-        401:
-          description: Unauthorized
-          schema:
-              $ref: '#/definitions/Error'
         500:
           description: "Unexpected error"
           schema:
@@ -60,10 +40,7 @@ paths:
       summary: "Generar token de usuario"
   /signup:
     post:
-      tags:
-        - user
-      description: |
-        Endpoint para dar de alta un usuario.
+      description: "Endpoint para dar de alta un usuario."
       parameters:
         - description: "Datos para dar de alta un usuario"
           in: body
@@ -86,7 +63,7 @@ paths:
           description: "Unexpected error"
           schema:
             $ref: "#/definitions/Error"
-      summary: "Dar de un application server"
+
   /users/{userId}:
     parameters:
       - description: "Perfil de usuario"
@@ -586,8 +563,10 @@ definitions:
         format: password
   UserData:
     properties:
-      personalInformation:
-        $ref: '#/definitions/PersonalInformation'
+      display_name:
+        type: string
+      email:
+        type: string
       password:
         type: string
         format: password
