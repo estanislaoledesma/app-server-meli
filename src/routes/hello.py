@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import jsonify
-from ..settings import response_handler
+from ..settings import responsehandler
 from flask_api import status
 
 class HelloWorld(Resource):
@@ -10,5 +10,5 @@ class HelloWorld(Resource):
 
     def get(self):
         response_data = {'Hello': 'World'}
-        response = response_handler.Response_Handler(status.HTTP_200_OK, response_data)
-        return response.getResponse()
+        response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
+        return response.get_response()
