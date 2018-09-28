@@ -2,6 +2,8 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from flask_api import status
+
 from unittest import TestCase
 
 from src.settings.application import app
@@ -17,11 +19,12 @@ class Test_Authetication(TestCase):
         pass
 
     def test_hello_world(self):
-        resultado = self.app.get('/)
-        assert resultado.get_json(force=True) ['Hello'] == 'World'
+        response = self.app.get('/')
+        assert response.get_json(force=True) ['Hello'] == 'World'
 
     def test_sign_up(self):
+        display_name = 'Test'
         email = 'test@domain.com'
         password = 'password'
-        resultado = self.app.post('/signup', data = dict(email = email, password = password), follow_redirects = True)
-        assert resultado.get_json(force=True) ['code'] == Config.CODE_OK
+        response = self.app.post('/signup', json = {'display_name': display_name, 'email': email, 'password': password})
+        assert status.is_success(response.status_code)

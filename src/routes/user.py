@@ -2,8 +2,8 @@ from flask_restful import Resource
 from flask import request, redirect, url_for, jsonify
 import json
 from ..settings import error_handler, response_handler
-from ..settings import config
 import pyrebase
+from flask_api import status
 
 class Sign_Up(Resource):
 
@@ -23,11 +23,11 @@ class Sign_Up(Resource):
             auth = self.firebase.auth()
             user = auth.create_user_with_email_and_password(email, password)
             response_data = {'token': user ['idToken']}
-            response = response_handler.Response_Handler(config.Config.CODE_OK, response_data)
+            response = response_handler.Response_Handler(status.HTTP_200_OK, response_data)
             return response.getResponse()
 
         except pyrebase.pyrebase.HTTPError:
-            error = error_handler.Error_Handler(config.Config.CODE_BAD_REQUEST, 'Datos incorrectos. Intente de nuevo.')
+            error = error_handler.Error_Handler(status.HTTP_400_BAD_REQUEST, 'Datos incorrectos. Intente de nuevo.')
             return error.getErrorResponse()
 
  
@@ -47,13 +47,13 @@ class Login(Resource):
             user = auth.sign_in_with_email_and_password(email, password)
 
             response_data = {'token': user['idToken']}
-            response = response_handler.Response_Handler(config.Config.CODE_OK, response_data)
+            response = response_handler.Response_Handler(status.HTTP_200_OK, response_data)
             return response.getResponse()
 
         except pyrebase.pyrebase.HTTPError as e:
             error_json = e.args[1]
             error_message = json.loads(error_json)["error"]["message"]
-            error = error_handler.Error_Handler(config.Config.CODE_BAD_REQUEST, error_message)
+            error = error_handler.Error_Handler(status.HTTP_400_BAD_REQUEST, error_message)
             return error.getErrorResponse()
 
         # return redirect(url_for('hello'))
