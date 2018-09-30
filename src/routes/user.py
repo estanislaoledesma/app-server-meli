@@ -22,7 +22,7 @@ class SignUp(Resource):
         auth = self.firebase.auth()
         try:
             user = auth.create_user_with_email_and_password(email, password)
-            response_data = {'token': user ['idToken']}
+            response_data = {'email': email, 'password': password, 'token': user['idToken']}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
 
@@ -46,7 +46,7 @@ class Login(Resource):
         try:
             user = auth.sign_in_with_email_and_password(email, password)
 
-            response_data = {'token': user['idToken']}
+            response_data = {'email': email, 'password': password, 'token': user['idToken']}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
 
