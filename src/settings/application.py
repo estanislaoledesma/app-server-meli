@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_restful import Api
 from flask_marshmallow import Marshmallow
+from flask_pymongo import PyMongo
 from src.routes import hello, user
 from .config import Config
 import logging
@@ -13,6 +14,10 @@ ma = Marshmallow(app)
 # Configuracion de Firebase
 firebase = pyrebase.initialize_app(Config.setup)
 
+#Configuracion de mongodb
+app.config["MONGO_URI"] = "mongodb://localhost:8000/meli_db"
+mongo = PyMongo(app)
+db = mongo.db
 
 # Configuracion del logger
 if __name__ != '__main__':
