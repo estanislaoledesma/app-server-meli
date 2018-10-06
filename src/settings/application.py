@@ -2,7 +2,7 @@ from flask import Flask
 from flask_restful import Api
 from flask_marshmallow import Marshmallow
 from flask_pymongo import PyMongo
-from src.routes import hello, user
+from src.routes import hello, user, products
 from .config import Config
 import logging
 import pyrebase
@@ -28,3 +28,8 @@ if __name__ != '__main__':
 api.add_resource(hello.HelloWorld, '/', resource_class_kwargs={'logger': app.logger, 'firebase': firebase})
 api.add_resource(user.SignUp, '/signup', resource_class_kwargs={'logger': app.logger, 'firebase': firebase})
 api.add_resource(user.Login, '/login', resource_class_kwargs={'logger': app.logger, 'firebase': firebase})
+api.add_resource(products.Publish, '/publish', resource_class_kwargs={'logger': app.logger, 'mongo': mongo})
+
+
+
+
