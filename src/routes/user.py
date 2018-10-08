@@ -1,3 +1,4 @@
+# coding: utf-8
 from flask_restful import Resource
 from flask import request, redirect, url_for, jsonify
 from ..settings import errorhandler, responsehandler
@@ -10,6 +11,7 @@ class SignUp(Resource):
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
         self.firebase = kwargs.get('firebase')
+        self.mongo = kwargs.get('mongo')
 
     def post(self):
         json_data = request.get_json(force=True)
