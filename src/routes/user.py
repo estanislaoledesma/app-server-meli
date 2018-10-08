@@ -22,11 +22,13 @@ class SignUp(Resource):
         auth = self.firebase.auth()
         try:
             user = auth.create_user_with_email_and_password(email, password)
-            response_data = {'email': email, 'password': password, 'token': user['idToken']}
+
+            response_data = {'email': email, 'password': password, 'token': user['refreshToken']}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
 
         except pyrebase.pyrebase.HTTPError as e:
+            error_message = errorhandler.get_error_message(e)
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, e)
             return error.get_error_response()
 
@@ -46,12 +48,11 @@ class Login(Resource):
         try:
             user = auth.sign_in_with_email_and_password(email, password)
 
-            response_data = {'email': email, 'password': password, 'token': user['idToken']}
+            response_data = {'email': email, 'password': password, 'token': user['refreshToken']}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
 
         except pyrebase.pyrebase.HTTPError as e:
-            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, e)
+            error_message = errorhandler.get_error_message(e)
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
             return error.get_error_response()
-
-        # return redirect(url_for('hello'))
