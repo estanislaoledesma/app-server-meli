@@ -11,6 +11,11 @@ consumes:
   - application/json
 produces:
   - application/json
+components:
+  securitySchemes:
+    token:
+      type: http
+      scheme: bearer
 paths:
   /login:
     post:
@@ -55,6 +60,59 @@ paths:
             properties:
               token:
                 $ref: '#/definitions/Token'
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+
+  /products:
+    post:
+      description: "Endpoint para publicar un producto."
+      security:
+        - token: []
+      parameters:
+        - description: "Datos para publicar un producto"
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/Product"
+      responses:
+        200:
+          description: "Publicación correcta"
+          schema:
+            properties:
+              token:
+                $ref: '#/definitions/Token'
+              product:
+                $ref: '#/definitions/PublishedProduct'
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+    get:
+      description: "Endpoint para obtener productos publicados."
+      security:
+        - token: []
+      responses:
+        200:
+          description: "Obtención ok"
+          schema:
+            properties:
+              token:
+                $ref: '#/definitions/Token'
+              products:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/PublishedProduct'
         400:
           description: "Incumplimiento de precondiciones (parámetros faltantes)"
           schema:
@@ -553,7 +611,7 @@ definitions:
     properties:
       token:
         type: string
-        description: Token de autenticación
+        description: "Token de autenticación"
   ApplicationLoginCredentials:
     properties:
       email:
@@ -570,6 +628,31 @@ definitions:
       password:
         type: string
         format: password
+  Product:
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      price:
+        type: number
+      images:
+        type: object
+  PublishedProduct:
+    properties:
+      id:
+        type: number
+      name:
+        type: string
+      description:
+        type: string
+      price:
+        type: number
+      images:
+        type: object
+      userId:
+        type: number
+
   User:
     properties:
       personalInformation:
