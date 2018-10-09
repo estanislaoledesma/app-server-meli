@@ -16,7 +16,7 @@ ma = Marshmallow(app)
 firebase = pyrebase.initialize_app(Config.setup)
 
 #Configuracion de mongodb
-app.config["MONGO_URI"] = "mongodb://localhost:27017/meli_db"
+#app.config["MONGO_URI"] = "mongodb://localhost:27017/meli_db"
 mongo = PyMongo(app)
 db = mongo.db
 

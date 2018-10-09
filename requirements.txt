@@ -50,6 +50,7 @@ Pyrebase==3.0.27
 python-dateutil==2.7.3
 pytz==2018.5
 pyxdg==0.25
+pymongo==3.7.1
 requests==2.19.1
 rsa==4.0
 SecretStorage==2.3.1
