@@ -51,17 +51,17 @@ class Products(Resource):
     def post(self):
         try:
             # Authentication
-            auth_header = request.headers.get('Authorization')
-            auth_token = auth_header.split(" ")[1]
-            auth = self.firebase.auth()
-            user = auth.refresh(auth_token)
+#            auth_header = request.headers.get('Authorization')
+#            auth_token = auth_header.split(" ")[1]
+#            auth = self.firebase.auth()
+#            user = auth.refresh(auth_token)
 
             json_data = request.get_json(force=True)
             self.logger.info(json_data)
             product = json_data['product']
 
             product_to_publish = {}
-            product_to_publish ['userId'] = user ['userId']
+#            product_to_publish ['userId'] = user ['userId']
             product_to_publish ['name'] = product ['name']
             product_to_publish ['images'] = product ['images']
             product_to_publish ['price'] = product ['price']
@@ -69,7 +69,8 @@ class Products(Resource):
             product_id = self.mongo.db.products.insert_one(product_to_publish).inserted_id
             product_to_publish ['_id'] = str(product_id)
 
-            response_data = {'token': user['refreshToken'], 'product': product_to_publish}
+#            response_data = {'token': user['refreshToken'], 'product': product_to_publish}
+            response_data = {'product': product_to_publish}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
 
