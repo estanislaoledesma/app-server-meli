@@ -1,4 +1,6 @@
 # coding: utf-8
+import os
+
 from flask import Flask
 from flask_restful import Api
 from flask_marshmallow import Marshmallow
@@ -16,8 +18,13 @@ ma = Marshmallow(app)
 firebase = pyrebase.initialize_app(Config.setup)
 
 #Configuracion de mongodb
+MONGO_URL = os.environ.get('MONGO_URL')
+if not MONGO_URL:
+    MONGO_URL = "mongodb://localhost:27017/meli_db";
+
 #app.config["MONGO_URI"] = "mongodb://localhost:27017/meli_db"
-app.config["MONGO_URI"] = "mongodb://martin:martinbosch17@ds121343.mlab.com:21343/meli"
+#app.config["MONGO_URI"] = "mongodb://martin:martinbosch17@ds121343.mlab.com:21343/meli"
+app.config['MONGO_URI'] = MONGO_URL
 mongo = PyMongo(app)
 db = mongo.db
 
