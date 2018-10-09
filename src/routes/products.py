@@ -5,6 +5,7 @@ from ..settings import errorhandler, responsehandler
 from flask_api import status
 import pyrebase, pymongo
 import base64
+import os
 
 class Products(Resource):
 
