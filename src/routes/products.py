@@ -4,6 +4,7 @@ from flask import request, redirect, url_for, jsonify
 from ..settings import errorhandler, responsehandler
 from flask_api import status
 import pyrebase, pymongo
+import base64
 
 class Products(Resource):
 
@@ -61,11 +62,14 @@ class Products(Resource):
             product = json_data['product']
 
             product_to_publish = {}
-            product_to_publish ['userId'] = user ['userId']
-            product_to_publish ['name'] = product ['name']
-            product_to_publish ['images'] = product ['images']
-            product_to_publish ['price'] = product ['price']
-            product_to_publish ['description'] = product ['description']
+            product_to_publish ['userId'] = user['userId']
+            product_to_publish ['name'] = product['name']
+
+#            product_to_publish ['images'] = product['images']
+            self.save_images(product['images'])
+
+            product_to_publish ['price'] = product['price']
+            product_to_publish ['description'] = product['description']
             product_id = self.mongo.db.products.insert_one(product_to_publish).inserted_id
             product_to_publish ['_id'] = str(product_id)
 
@@ -89,3 +93,9 @@ class Products(Resource):
         except pymongo.errors.PyMongoError as e:
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
             return error.get_error_response()
+
+    def save_images(self, images):
+        for image in images:
+            with open("images/image.jpg", "wb") as f:
+                #base64.b64decode(image)
+                f.write(base64.decodebytes(image))
