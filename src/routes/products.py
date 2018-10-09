@@ -96,7 +96,10 @@ class Products(Resource):
 
     def save_images(self, images):
         for image in images:
-            with open("images/image.jpg", "wb") as f:
+            with open("image.jpg", "wb") as f:
                 #base64.b64decode(image)
                 #base64.decodebytes(image)
                 f.write(base64.b64decode(image))
+
+            file = request.files['file']
+            file.save(os.path.join("/images/", "image.jpg"))
