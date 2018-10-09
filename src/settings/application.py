@@ -17,6 +17,7 @@ firebase = pyrebase.initialize_app(Config.setup)
 
 #Configuracion de mongodb
 #app.config["MONGO_URI"] = "mongodb://localhost:27017/meli_db"
+app.config["MONGO_URI"] = "mongodb://martin:martinbosch17@ds121343.mlab.com:21343/meli"
 mongo = PyMongo(app)
 db = mongo.db
 
