@@ -28,7 +28,7 @@ app.config['MONGO_URI'] = MONGO_URL
 mongo = PyMongo(app)
 db = mongo.db
 
-os.mkdir("images")
+#os.mkdir("images")
 
 # Configuracion del logger
 if __name__ != '__main__':
