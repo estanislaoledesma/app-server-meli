@@ -98,4 +98,5 @@ class Products(Resource):
         for image in images:
             with open("images/image.jpg", "wb") as f:
                 #base64.b64decode(image)
-                f.write(base64.decodebytes(image))
+                #base64.decodebytes(image)
+                f.write(base64.b64decode(image))
