@@ -9,6 +9,7 @@ from src.routes import hello, user, products
 from .config import Config
 import logging
 import pyrebase
+from flask.ext.uploads import UploadSet, configure_uploads, IMAGES
 
 app = Flask(__name__)
 api = Api(app)
@@ -22,13 +23,15 @@ MONGO_URL = os.environ.get('MONGO_URL')
 if not MONGO_URL:
     MONGO_URL = "mongodb://localhost:27017/meli_db";
 
-#app.config["MONGO_URI"] = "mongodb://localhost:27017/meli_db"
-#app.config["MONGO_URI"] = "mongodb://martin:martinbosch17@ds121343.mlab.com:21343/meli"
 app.config['MONGO_URI'] = MONGO_URL
 mongo = PyMongo(app)
 db = mongo.db
 
+#Configuracion de flask-uploader
 #os.mkdir("images")
+photos = UploadSet('photos', IMAGES)
+app.config['UPLOADED_PHOTOS_DEST'] = 'static/img'
+configure_uploads(app, photos)
 
 # Configuracion del logger
 if __name__ != '__main__':
