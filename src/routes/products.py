@@ -5,6 +5,7 @@ from ..settings import errorhandler, responsehandler
 from flask_api import status
 import pyrebase, pymongo
 import base64
+from gridfs import GridFS
 
 class Products(Resource):
 
@@ -95,11 +96,13 @@ class Products(Resource):
             return error.get_error_response()
 
     def get_images(self, encoded_images):
+        fs = GridFS(self.mongo.db)
         images = []
         for image in encoded_images:
             with open("foo.jpg", "wb") as f:
                 f.write(base64.b64decode(image))
-                images.append(f)
+                fs_id = fs.put(f, content_type='image/jpg', file_name='foo.jpg')
+                images.append(fs_id)
 
         return images
 
