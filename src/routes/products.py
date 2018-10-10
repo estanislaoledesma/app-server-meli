@@ -6,6 +6,7 @@ from flask_api import status
 import pyrebase, pymongo
 import base64
 from gridfs import GridFS
+from bson import ObjectId
 
 class Products(Resource):
 
@@ -101,7 +102,7 @@ class Products(Resource):
         for image in encoded_images:
             name = 'foo.jpg'
             fs_id = self.fs.put(base64.b64decode(image), content_type='image/jpg', file_name=name)
-            images.append(fs_id.valueOf())
+            images.append(name)
 
 #            with open("foo.jpg", "wb") as f:
 #                f.write(base64.b64decode(image))
