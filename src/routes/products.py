@@ -79,13 +79,13 @@ class Products(Resource):
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
 
-        except IndexError as e:
-            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
-            return error.get_error_response()
+#        except IndexError as e:
+#            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
+#            return error.get_error_response()
 
-        except AttributeError as e:
-            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
-            return error.get_error_response()
+#        except AttributeError as e:
+#            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
+#            return error.get_error_response()
 
         except pyrebase.pyrebase.HTTPError as e:
             error_message = errorhandler.get_error_message(e)
