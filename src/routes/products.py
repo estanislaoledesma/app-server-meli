@@ -5,8 +5,6 @@ from ..settings import errorhandler, responsehandler
 from flask_api import status
 import pyrebase, pymongo
 import base64
-import os
-from werkzeug.datastructures import FileStorage
 
 class Products(Resource):
 
@@ -14,8 +12,7 @@ class Products(Resource):
         self.logger = kwargs.get('logger')
         self.mongo = kwargs.get('mongo')
         self.firebase = kwargs.get('firebase')
-        self.photos = kwargs.get('photos')
-        
+
     def get(self):
         try:
             # Authentication
