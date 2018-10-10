@@ -13,6 +13,7 @@ class Products(Resource):
         self.logger = kwargs.get('logger')
         self.mongo = kwargs.get('mongo')
         self.firebase = kwargs.get('firebase')
+        self.fs = GridFS(self.mongo.db)
 
     def get(self):
         try:
@@ -96,11 +97,11 @@ class Products(Resource):
             return error.get_error_response()
 
     def get_images(self, encoded_images):
-        fs = GridFS(self.mongo.db)
         images = []
         for image in encoded_images:
-            fs_id = fs.put(base64.b64decode(image), content_type='image/jpg', file_name='foo.jpg')
-            images.append(fs_id)
+            name = 'foo.jpg'
+            fs_id = self.fs.put(base64.b64decode(image), content_type='image/jpg', file_name=name)
+            images.append(name)
 
 #            with open("foo.jpg", "wb") as f:
 #                f.write(base64.b64decode(image))
