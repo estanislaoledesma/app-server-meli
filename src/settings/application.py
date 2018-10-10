@@ -9,7 +9,7 @@ from src.routes import hello, user, products
 from .config import Config
 import logging
 import pyrebase
-from flask.ext.uploads import UploadSet, configure_uploads, IMAGES
+from flask_uploads import UploadSet, configure_uploads, IMAGES
 
 app = Flask(__name__)
 api = Api(app)
