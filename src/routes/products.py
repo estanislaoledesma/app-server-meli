@@ -101,7 +101,7 @@ class Products(Resource):
         for image in encoded_images:
             name = 'foo.jpg'
             fs_id = self.fs.put(base64.b64decode(image), content_type='image/jpg', file_name=name)
-            images.append(name)
+            images.append(fs_id.valueOf())
 
 #            with open("foo.jpg", "wb") as f:
 #                f.write(base64.b64decode(image))
