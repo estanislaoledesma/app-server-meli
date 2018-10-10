@@ -6,6 +6,7 @@ from flask_api import status
 import pyrebase, pymongo
 import base64
 import os
+from werkzeug.datastructures import FileStorage
 
 class Products(Resource):
 
@@ -98,9 +99,11 @@ class Products(Resource):
 
     def save_images(self, images):
         for image in images:
+            file = None
             with open("foo.jpg", "wb") as f:
                 f.write(base64.b64decode(image))
-            self.photos.save("foo.jpg")
+                file = FileStorage(f)
+            path = self.photos.save(file)
 
 #            self.photos.save(base64.b64decode(image))
 
