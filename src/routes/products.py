@@ -69,7 +69,7 @@ class Products(Resource):
             product_to_publish ['name'] = product['name']
 
 #            product_to_publish ['images'] = product['images']
-            self.save_images(product['images'])
+            product_to_publish['images'] = self.get_images(product['images'])
 
             product_to_publish ['price'] = product['price']
             product_to_publish ['description'] = product['description']
@@ -97,20 +97,17 @@ class Products(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
             return error.get_error_response()
 
-    def save_images(self, images):
-        for image in images:
+    def get_images(self, encoded_images):
+        images = []
+        for image in encoded_images:
             with open("foo.jpg", "wb") as f:
                 f.write(base64.b64decode(image))
+                images.append(f)
 
-            file = FileStorage(filename="foo.jpg")
-            path = self.photos.save(file)
+        return images
 
-#            self.photos.save(base64.b64decode(image))
 
 #            with open("foo.jpg", "wb") as f:
                 #base64.b64decode(image)
                 #base64.decodebytes(image)
 #                f.write(base64.b64decode(image))
-
-#            file = request.files['file']
-#            file.save(os.path.join("/images/", "image.jpg"))
