@@ -99,10 +99,13 @@ class Products(Resource):
         fs = GridFS(self.mongo.db)
         images = []
         for image in encoded_images:
-            with open("foo.jpg", "wb") as f:
-                f.write(base64.b64decode(image))
-                fs_id = fs.put(f, content_type='image/jpg', file_name='foo.jpg')
-                images.append(fs_id)
+            fs_id = fs.put(base64.b64decode(image), content_type='image/jpg', file_name='foo.jpg')
+            images.append(fs_id)
+
+#            with open("foo.jpg", "wb") as f:
+#                f.write(base64.b64decode(image))
+#                fs_id = fs.put(f, content_type='image/jpg', file_name='foo.jpg')
+#                images.append(fs_id)
 
         return images
 
