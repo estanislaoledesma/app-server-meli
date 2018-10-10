@@ -13,6 +13,7 @@ class Products(Resource):
         self.logger = kwargs.get('logger')
         self.mongo = kwargs.get('mongo')
         self.firebase = kwargs.get('firebase')
+        self.photos = kwargs.get('photos')
         
     def get(self):
         try:
