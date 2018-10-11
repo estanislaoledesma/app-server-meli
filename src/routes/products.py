@@ -58,7 +58,7 @@ class Products(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
             return error.get_error_response()
 
-    def encode_images(self, image_name):
+    def encode_image(self, image_name):
         image = self.fs.get_last_version(image_name).read()
         return base64.b64encode(image)
 
