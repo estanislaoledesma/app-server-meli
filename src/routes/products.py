@@ -54,9 +54,9 @@ class Products(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
             return error.get_error_response()
 
-        except pymongo.errors.PyMongoError as e:
-            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
-            return error.get_error_response()
+#        except pymongo.errors.PyMongoError as e:
+#            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
+#            return error.get_error_response()
 
     def encode_image(self, image_name):
         image = self.fs.get_last_version(image_name).read()
