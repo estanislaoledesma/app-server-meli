@@ -29,10 +29,13 @@ class Product(Resource):
             product = self.mongo.db.products.find_one({'_id': ObjectId(product_id)})
 
             product_to_display = {}
+            product_to_display['_id'] = str(product['_id'])
             product_to_display['name'] = product['name']
             product_to_display['price'] = product['price']
             product_to_display['images'] = self.encode_images(product['images'])
-            product_to_display['_id'] = str(product['_id'])
+            product_to_display['category'] = product['category']
+            product_to_display['ubication'] = product['ubication']
+            product_to_display['units'] = product['units']
 
             response_data = {'token': user['refreshToken'], 'product': product_to_display}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)

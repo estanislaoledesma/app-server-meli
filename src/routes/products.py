@@ -84,6 +84,9 @@ class Products(Resource):
             product_to_publish ['description'] = product['description']
             product_to_publish['images'] = self.decoded_images(product['images'], product['name'])
             product_to_publish ['price'] = product['price']
+            product_to_publish['category'] = product['category']
+            product_to_publish['ubication'] = product['ubication']
+            product_to_publish['units'] = product['units']
 
             product_id = self.mongo.db.products.insert_one(product_to_publish).inserted_id
             product_to_publish ['_id'] = str(product_id)
