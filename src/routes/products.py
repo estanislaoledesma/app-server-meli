@@ -25,11 +25,17 @@ class Products(Resource):
             user = auth.refresh(auth_token)
 
             products_cursor = self.mongo.db.products.find()
-            products = {}
+#            products = {}
+            products = []
             for product in products_cursor:
-                product_to_display = product
-                product_to_display ['_id'] = str(product_to_display ['_id'])
-                products [str(product ['_id'])] = product_to_display
+                product_to_display = {}
+                product_to_display['name'] = product['name']
+                product_to_display['price'] = product['price']
+                product_to_display['image'] = self.encode_image(product['images'][0])
+                product_to_display['_id'] = str(product['_id'])
+
+#                products[str(product['_id'])] = product_to_display
+                products.append(product_to_display)
 
             response_data = {'token': user['refreshToken'], 'products': products}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
@@ -52,6 +58,17 @@ class Products(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
             return error.get_error_response()
 
+    def encode_images(self, image_name):
+        image = self.fs.get_last_version(image_name).read()
+        return base64.b64encode(image)
+
+    #        encoded_images = []
+#        for name in images_name:
+#            image = self.fs.get_last_version(name).read()
+#            encoded_images.append(base64.b64encode(image))
+
+#        return encoded_images
+
     def post(self):
         try:
             # Authentication
@@ -65,16 +82,15 @@ class Products(Resource):
             product = json_data['product']
 
             product_to_publish = {}
-            product_to_publish ['userId'] = user['userId']
+#            product_to_publish ['userId'] = user['userId']
             product_to_publish ['name'] = product['name']
-
+            product_to_publish ['description'] = product['description']
 #            product_to_publish ['images'] = product['images']
             product_to_publish['images'] = self.get_images(product['images'])
-
             product_to_publish ['price'] = product['price']
-            product_to_publish ['description'] = product['description']
+
             product_id = self.mongo.db.products.insert_one(product_to_publish).inserted_id
-            product_to_publish ['_id'] = str(product_id)
+#            product_to_publish ['_id'] = str(product_id)
 
             response_data = {'token': user['refreshToken'], 'product': product_to_publish}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
@@ -101,7 +117,7 @@ class Products(Resource):
         images = []
         for image in encoded_images:
             name = 'foo.jpg'
-            fs_id = self.fs.put(base64.b64decode(image), content_type='image/jpg', file_name=name)
+            fs_id = self.fs.put(base64.b64decode(image), filename=name)
             images.append(name)
 
 #            with open("foo.jpg", "wb") as f:
