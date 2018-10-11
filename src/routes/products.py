@@ -8,7 +8,11 @@ import base64
 from gridfs import GridFS
 from bson import ObjectId
 
+TOKEN = 1
+THUMBNAIL = 0
+
 class Products(Resource):
+
 
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
@@ -20,7 +24,7 @@ class Products(Resource):
         try:
             # Authentication
             auth_header = request.headers.get('Authorization')
-            auth_token = auth_header.split(" ")[1]
+            auth_token = auth_header.split(" ")[TOKEN]
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
 
@@ -31,9 +35,8 @@ class Products(Resource):
                 product_to_display = {}
                 product_to_display['name'] = product['name']
                 product_to_display['price'] = product['price']
-                product_to_display['image'] = self.encode_image(product['images'][0])
+                product_to_display['image'] = self.encode_image(product['images'][THUMBNAIL])
                 product_to_display['_id'] = str(product['_id'])
-
 #                products[str(product['_id'])] = product_to_display
                 products.append(product_to_display)
 
@@ -61,22 +64,13 @@ class Products(Resource):
     def encode_image(self, image_name):
         image = self.fs.get_last_version(filename=image_name).read()
         return str(base64.b64encode(image), 'utf-8')
-#        return base64.encodestring(image)
 
-
-
-#            encoded_images = []
-#        for name in images_name:
-#            image = self.fs.get_last_version(name).read()
-#            encoded_images.append(base64.b64encode(image))
-
-#        return encoded_images
 
     def post(self):
         try:
             # Authentication
             auth_header = request.headers.get('Authorization')
-            auth_token = auth_header.split(" ")[1]
+            auth_token = auth_header.split(" ")[TOKEN]
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
 
@@ -88,8 +82,7 @@ class Products(Resource):
 #            product_to_publish ['userId'] = user['userId']
             product_to_publish ['name'] = product['name']
             product_to_publish ['description'] = product['description']
-#            product_to_publish ['images'] = product['images']
-            product_to_publish['images'] = self.get_images(product['images'])
+            product_to_publish['images'] = self.decoded_images(product['images'], product['name'])
             product_to_publish ['price'] = product['price']
 
             product_id = self.mongo.db.products.insert_one(product_to_publish).inserted_id
@@ -116,22 +109,13 @@ class Products(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
             return error.get_error_response()
 
-    def get_images(self, encoded_images):
+    def decoded_images(self, encoded_images, product_name):
         images = []
+        i = 0
         for image in encoded_images:
-            name = 'foo.jpg'
+            name = product_name + str(i)
             fs_id = self.fs.put(base64.b64decode(image), filename=name)
             images.append(name)
-
-#            with open("foo.jpg", "wb") as f:
-#                f.write(base64.b64decode(image))
-#                fs_id = fs.put(f, content_type='image/jpg', file_name='foo.jpg')
-#                images.append(fs_id)
+            i+=1
 
         return images
-
-
-#            with open("foo.jpg", "wb") as f:
-                #base64.b64decode(image)
-                #base64.decodebytes(image)
-#                f.write(base64.b64decode(image))
