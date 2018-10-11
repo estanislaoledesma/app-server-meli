@@ -21,7 +21,9 @@ class SignUp(Resource):
         self.logger.info(email)
         self.logger.info(password)
 
-        auth = self.firebase.auth()
+        firebase = self.get_firebase()
+
+        auth = firebase.auth()
         try:
             user = auth.create_user_with_email_and_password(email, password)
 
@@ -33,6 +35,9 @@ class SignUp(Resource):
             error_message = errorhandler.get_error_message(e)
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, e)
             return error.get_error_response()
+
+    def get_firebase(self):
+        return self.firebase
 
 
 class Login(Resource):
