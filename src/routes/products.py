@@ -60,7 +60,8 @@ class Products(Resource):
 
     def encode_image(self, image_name):
         image = self.fs.get_last_version(filename=image_name).read()
-        return base64.b64encode(image)
+#        return str(base64.b64encode(image), 'utf-8')
+        return base64.encodestring(image)
 
 
 
