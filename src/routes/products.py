@@ -62,7 +62,9 @@ class Products(Resource):
         image = self.fs.get_last_version(image_name).read()
         return base64.b64encode(image)
 
-    #        encoded_images = []
+
+
+#            encoded_images = []
 #        for name in images_name:
 #            image = self.fs.get_last_version(name).read()
 #            encoded_images.append(base64.b64encode(image))
