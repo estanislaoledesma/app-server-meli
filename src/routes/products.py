@@ -35,7 +35,7 @@ class Products(Resource):
                 product_to_display = {}
                 product_to_display['name'] = product['name']
                 product_to_display['price'] = product['price']
-                product_to_display['image'] = self.encode_image(product['images'][THUMBNAIL])
+                product_to_display['thumbnail'] = self.encode_image(product['images'][THUMBNAIL])
                 product_to_display['_id'] = str(product['_id'])
 #                products[str(product['_id'])] = product_to_display
                 products.append(product_to_display)
