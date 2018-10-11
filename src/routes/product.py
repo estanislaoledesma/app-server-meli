@@ -31,7 +31,7 @@ class Product(Resource):
             product_to_display = {}
             product_to_display['name'] = product['name']
             product_to_display['price'] = product['price']
-            product_to_display['thumbnail'] = self.encode_image(product['images'][0])
+            product_to_display['images'] = self.encode_images(product['images'])
             product_to_display['_id'] = str(product['_id'])
 
             response_data = {'token': user['refreshToken'], 'product': product_to_display}
@@ -54,6 +54,12 @@ class Product(Resource):
 #        except pymongo.errors.PyMongoError as e:
 #            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
 #            return error.get_error_response()
+
+    def encode_images(self, images_name):
+        l = []
+        for name in images_name:
+            l.append( self.encode_image(name) )
+        return l
 
     def encode_image(self, image_name):
         image = self.fs.get_last_version(filename=image_name).read()
