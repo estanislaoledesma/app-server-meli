@@ -59,7 +59,7 @@ class Products(Resource):
 #            return error.get_error_response()
 
     def encode_image(self, image_name):
-        image = self.fs.get_last_version(image_name).read()
+        image = self.fs.get_last_version(filename=image_name).read()
         return base64.b64encode(image)
 
 
@@ -92,7 +92,7 @@ class Products(Resource):
             product_to_publish ['price'] = product['price']
 
             product_id = self.mongo.db.products.insert_one(product_to_publish).inserted_id
-#            product_to_publish ['_id'] = str(product_id)
+            product_to_publish ['_id'] = str(product_id)
 
             response_data = {'token': user['refreshToken'], 'product': product_to_publish}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
