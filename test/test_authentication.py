@@ -8,7 +8,6 @@ from unittest import TestCase
 from mock import patch, MagicMock, PropertyMock
 
 from src.settings.application import app
-from src.routes.user import SignUp, Login
 
 class Test_Authetication(TestCase):
 
@@ -24,7 +23,7 @@ class Test_Authetication(TestCase):
         assert response.get_json(force=True) ['Hello'] == 'World'
 
     @patch('src.routes.user.SignUp.get_firebase')
-    def test_sign_up(self, mock_get_firebase):
+    def test_sign_up_ok(self, mock_get_firebase):
         display_name = 'Test'
         email = 'test@domain.com'
         password = 'password'
@@ -34,4 +33,16 @@ class Test_Authetication(TestCase):
         mock_get_firebase.auth.return_value = mockAux
 
         response = self.app.post('/signup', json = {'display_name': display_name, 'email': email, 'password': password})
+        assert status.is_success(response.status_code)
+
+    @patch('src.routes.user.Login.get_firebase')
+    def test_log_in_ok(self, mock_get_firebase):
+        email = 'test@domain.com'
+        password = 'password'
+
+        mockAux = MagicMock()
+        mockAux.sign_in_with_email_and_password.return_value = {'refreshToken': 'testToken'}
+        mock_get_firebase.auth.return_value = mockAux
+
+        response = self.app.post('/signup', json = {'email': email, 'password': password})
         assert status.is_success(response.status_code)

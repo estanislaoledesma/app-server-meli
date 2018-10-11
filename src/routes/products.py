@@ -29,7 +29,7 @@ class Products(Resource):
             user = auth.refresh(auth_token)
 
             products_cursor = self.mongo.db.products.find()
-#            products = {}
+
             products = []
             for product in products_cursor:
                 product_to_display = {}
@@ -37,7 +37,6 @@ class Products(Resource):
                 product_to_display['price'] = product['price']
                 product_to_display['thumbnail'] = self.encode_image(product['images'][THUMBNAIL])
                 product_to_display['_id'] = str(product['_id'])
-#                products[str(product['_id'])] = product_to_display
                 products.append(product_to_display)
 
             response_data = {'token': user['refreshToken'], 'products': products}
@@ -61,6 +60,10 @@ class Products(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
             return error.get_error_response()
 
+        except Exception as e:
+            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
+            return error.get_error_response()
+
     def encode_image(self, image_name):
         image = self.fs.get_last_version(filename=image_name).read()
         return str(base64.b64encode(image), 'utf-8')
@@ -79,7 +82,6 @@ class Products(Resource):
             product = json_data['product']
 
             product_to_publish = {}
-#            product_to_publish ['userId'] = user['userId']
             product_to_publish ['name'] = product['name']
             product_to_publish ['description'] = product['description']
             product_to_publish['images'] = self.decoded_images(product['images'], product['name'])
@@ -110,6 +112,10 @@ class Products(Resource):
 
         except pymongo.errors.PyMongoError as e:
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
+            return error.get_error_response()
+
+        except Exception as e:
+            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
             return error.get_error_response()
 
     def decoded_images(self, encoded_images, product_name):

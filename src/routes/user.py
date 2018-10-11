@@ -36,6 +36,10 @@ class SignUp(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, e)
             return error.get_error_response()
 
+        except Exception as e:
+            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
+            return error.get_error_response()
+
     def get_firebase(self):
         return self.firebase
 
@@ -51,7 +55,7 @@ class Login(Resource):
         email = json_data['email']
         password = json_data['password']
         
-        auth = self.firebase.auth()
+        auth = self.get_firebase().auth()
         try:
             user = auth.sign_in_with_email_and_password(email, password)
 
@@ -63,3 +67,10 @@ class Login(Resource):
             error_message = errorhandler.get_error_message(e)
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
             return error.get_error_response()
+
+        except Exception as e:
+            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
+            return error.get_error_response()
+
+    def get_firebase(self):
+        return self.firebase
