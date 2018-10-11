@@ -44,22 +44,22 @@ class Products(Resource):
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
 
-#        except IndexError as e:
-#            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
-#            return error.get_error_response()
+        except IndexError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
+            return error.get_error_response()
 
-#        except AttributeError as e:
-#            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
-#            return error.get_error_response()
+        except AttributeError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
+            return error.get_error_response()
 
         except pyrebase.pyrebase.HTTPError as e:
             error_message = errorhandler.get_error_message(e)
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
             return error.get_error_response()
 
-#        except pymongo.errors.PyMongoError as e:
-#            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
-#            return error.get_error_response()
+        except pymongo.errors.PyMongoError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
+            return error.get_error_response()
 
     def encode_image(self, image_name):
         image = self.fs.get_last_version(filename=image_name).read()
@@ -92,13 +92,13 @@ class Products(Resource):
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
 
-#        except IndexError as e:
-#            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
-#            return error.get_error_response()
+        except IndexError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
+            return error.get_error_response()
 
-#        except AttributeError as e:
-#            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
-#            return error.get_error_response()
+        except AttributeError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
+            return error.get_error_response()
 
         except pyrebase.pyrebase.HTTPError as e:
             error_message = errorhandler.get_error_message(e)
