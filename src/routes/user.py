@@ -34,10 +34,6 @@ class SignUp(Resource):
         except ValueError as e:
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
             return error.get_error_response()
-        
-        except AuthError as e:
-            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
-            return error.get_error_response()
 
         except pyrebase.pyrebase.HTTPError as e:
             error_message = errorhandler.get_error_message(e)
@@ -77,10 +73,6 @@ class Login(Resource):
             return error.get_error_response()
         
         except ValueError as e:
-            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
-            return error.get_error_response()
-        
-        except AuthError as e:
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
             return error.get_error_response()
 
