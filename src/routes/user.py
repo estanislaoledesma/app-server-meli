@@ -30,6 +30,14 @@ class SignUp(Resource):
             response_data = {'email': email, 'password': password, 'token': user['refreshToken']}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
+        
+        except ValueError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
+            return error.get_error_response()
+        
+        except AuthError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
+            return error.get_error_response()
 
         except pyrebase.pyrebase.HTTPError as e:
             error_message = errorhandler.get_error_message(e)
@@ -67,6 +75,14 @@ class Login(Resource):
             error_message = errorhandler.get_error_message(e)
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
             return error.get_error_response()
+        
+        except ValueError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
+            return error.get_error_response()
+        
+        except AuthError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
+            return error.get_error_response()
 
         except Exception as e:
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
@@ -74,3 +90,51 @@ class Login(Resource):
 
     def get_firebase(self):
         return self.firebase
+    
+class User(Resource):
+
+    def __init__(self, **kwargs):
+        self.logger = kwargs.get('logger')
+        self.firebase = kwargs.get('firebase')
+        self.mongo = kwargs.get('mongo')
+
+    def get(self, email):
+        try:
+            auth_header = request.headers.get('Authorization')
+            if not auth_header:
+                raise IndexError
+            auth_token = auth_header.split(" ")[TOKEN]
+            auth = self.firebase.auth()
+            user = auth.refresh(auth_token)
+            
+            req_user = auth.get_user_by_email(email)
+            
+            info = {}
+            info['custom claims'] = req_user.custom_claims  #procesar?
+            info['display name'] = req_user.display_name
+            info['email'] = req_user.email
+            info['phone'] = req_user.phone_number
+            info['photo_url'] = req_user.photo_url          #va con foto?
+            info['uid'] = req_user.uid
+            #mas info? address? location?
+            
+            response_data = {'token': user['refreshToken'], 'user_info': info}
+            response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
+            return response.get_response()
+        
+        except ValueError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
+            return error.get_error_response()
+        
+        except IndexError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
+            return error.get_error_response()
+ 
+        except AttributeError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
+            return error.get_error_response()
+ 
+        except pyrebase.pyrebase.HTTPError as e:
+            error_message = errorhandler.get_error_message(e)
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
+            return error.get_error_response()
