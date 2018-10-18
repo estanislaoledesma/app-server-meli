@@ -44,5 +44,5 @@ class Test_Authetication(TestCase):
         mockAux.sign_in_with_email_and_password.return_value = {'refreshToken': 'testToken'}
         mock_get_firebase.auth.return_value = mockAux
 
-        response = self.app.post('/signup', json = {'email': email, 'password': password})
+        response = self.app.post('/login', json = {'email': email, 'password': password})
         assert status.is_success(response.status_code)
