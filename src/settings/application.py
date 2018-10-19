@@ -35,6 +35,6 @@ if __name__ != '__main__':
 api.add_resource(hello.HelloWorld, '/', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(user.SignUp, '/signup', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(user.Login, '/login', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
-api.add_resource(user.User, '/users/<email>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
+api.add_resource(user.User, '/users/<user_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(products.Products, '/products', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(product.Product, '/product/<product_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
