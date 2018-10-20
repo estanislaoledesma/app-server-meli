@@ -1,4 +1,5 @@
 # coding: utf-8
+from bson import ObjectId
 from flask_restful import Resource
 from flask import request, redirect, url_for, jsonify
 from ..settings import errorhandler, responsehandler
@@ -43,7 +44,7 @@ class SignUp(Resource):
         except ValueError as e:
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
             return error.get_error_response()
-        
+
 #        except AuthError as e:
 #            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
 #            return error.get_error_response()
@@ -88,7 +89,7 @@ class Login(Resource):
         except ValueError as e:
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
             return error.get_error_response()
-        
+
 #        except AuthError as e:
 #            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
 #            return error.get_error_response()
@@ -106,8 +107,11 @@ class User(Resource):
         self.logger = kwargs.get('logger')
         self.firebase = kwargs.get('firebase')
         self.mongo = kwargs.get('mongo')
+        
+    def get_firebase(self):
+        return self.firebase
 
-    def get(self, email):
+    def get(self, user_id):
         try:
             auth_header = request.headers.get('Authorization')
             if not auth_header:
@@ -116,16 +120,15 @@ class User(Resource):
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
             
-            req_user = auth.get_user_by_email(email)
+            req_user = self.mongo.db.users.find_one({'_id': ObjectId(user_id)})
             
             info = {}
-            info['custom claims'] = req_user.custom_claims  #procesar?
-            info['display name'] = req_user.display_name
-            info['email'] = req_user.email
-            info['phone'] = req_user.phone_number
-            info['photo_url'] = req_user.photo_url          #va con foto?
-            info['uid'] = req_user.uid
-            #mas info? address? location?
+            info['display name'] = req_user['display_name']
+            info['email'] = req_user['email']
+            info['phone'] = req_user['phone_number']
+            info['uid'] = req_user['uid']
+            info['address'] = req_user['address']
+            info['city'] = req_user['city']
             
             response_data = {'token': user['refreshToken'], 'user_info': info}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)

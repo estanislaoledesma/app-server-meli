@@ -25,7 +25,7 @@ class Test_Authetication(TestCase):
     @patch('src.routes.user.SignUp.get_firebase')
     def test_sign_up_ok(self, mock_get_firebase):
         display_name = 'Test'
-        email = 'test@domain.com'
+        email = 'test1@domain.com'
         password = 'password'
 
         mockAux = MagicMock()

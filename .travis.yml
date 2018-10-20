@@ -4,7 +4,8 @@ python:
   - "3.6"
   
 install:
-  - pip install codecov
+  - pip3 install -r requirements.txt
+  - pip3 install coverage
 
 script:
   - coverage run test/tests.py
