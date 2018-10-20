@@ -5,6 +5,7 @@ from ..settings import errorhandler, responsehandler
 import pyrebase
 from flask_api import status
 
+TOKEN = 1
 
 class SignUp(Resource):
 
@@ -18,6 +19,7 @@ class SignUp(Resource):
         self.logger.info(json_data)
         email = json_data['email']
         password = json_data['password']
+        display_name = json_data['display_name']
         self.logger.info(email)
         self.logger.info(password)
 
@@ -27,7 +29,14 @@ class SignUp(Resource):
         try:
             user = auth.create_user_with_email_and_password(email, password)
 
-            response_data = {'email': email, 'password': password, 'token': user['refreshToken']}
+            self.logger.info(user)
+            user_data = {}
+            user_data['id'] = user['localId']
+            user_data['display_name'] = display_name
+            self.mongo.db.user.insert_one(user_data)
+
+            response_data = {'email': email, 'password': password, 'display_name': display_name,
+                             'token': user['refreshToken']}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
         
@@ -35,18 +44,18 @@ class SignUp(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
             return error.get_error_response()
         
-        except AuthError as e:
-            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
-            return error.get_error_response()
+#        except AuthError as e:
+#            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
+#            return error.get_error_response()
 
         except pyrebase.pyrebase.HTTPError as e:
             error_message = errorhandler.get_error_message(e)
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, e)
             return error.get_error_response()
 
-        except Exception as e:
-            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
-            return error.get_error_response()
+#        except Exception as e:
+#            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
+#            return error.get_error_response()
 
     def get_firebase(self):
         return self.firebase
@@ -80,9 +89,9 @@ class Login(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
             return error.get_error_response()
         
-        except AuthError as e:
-            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
-            return error.get_error_response()
+#        except AuthError as e:
+#            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
+#            return error.get_error_response()
 
         except Exception as e:
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')

@@ -35,8 +35,13 @@ class Product(Resource):
             product_to_display['price'] = product['price']
             product_to_display['images'] = self.encode_images(product['images'])
             product_to_display['category'] = product['category']
-            product_to_display['ubication'] = product['ubication']
             product_to_display['units'] = product['units']
+
+            user_data = self.mongo.db.user.find_one({"id": user['userId']})
+            product_to_display['display_name'] = user_data['display_name']
+            product_to_display['ubication'] = product['ubication']
+            product_to_display['owner_id'] = product['user_id']
+
 
             response_data = {'token': user['refreshToken'], 'product': product_to_display}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)

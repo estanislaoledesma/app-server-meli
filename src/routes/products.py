@@ -78,8 +78,10 @@ class Products(Resource):
             user = auth.refresh(auth_token)
 
             json_data = request.get_json(force=True)
-            self.logger.info(json_data)
+#            self.logger.info(json_data)
             product = json_data['product']
+
+#            self.logger.info(  self.mongo.db.user.find_one({"id": user['userId']})['display_name']  )
 
             product_to_publish = {}
             product_to_publish ['name'] = product['name']
@@ -89,6 +91,7 @@ class Products(Resource):
             product_to_publish['category'] = product['category']
             product_to_publish['ubication'] = product['ubication']
             product_to_publish['units'] = product['units']
+            product_to_publish['user_id'] = user['userId']
 
             product_id = self.mongo.db.products.insert_one(product_to_publish).inserted_id
             product_to_publish ['_id'] = str(product_id)
@@ -114,9 +117,9 @@ class Products(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
             return error.get_error_response()
 
-        except Exception as e:
-            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
-            return error.get_error_response()
+#        except Exception as e:
+#            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
+#            return error.get_error_response()
 
     def decoded_images(self, encoded_images, product_name):
         images = []
