@@ -17,26 +17,29 @@ class SignUp(Resource):
 
     def post(self):
         json_data = request.get_json(force=True)
-        self.logger.info(json_data)
         email = json_data['email']
         password = json_data['password']
         display_name = json_data['display_name']
-        self.logger.info(email)
-        self.logger.info(password)
-
+        address = json_data['address']
+        city = json_data['city']
+        print(email)
         firebase = self.get_firebase()
 
         auth = firebase.auth()
         try:
             user = auth.create_user_with_email_and_password(email, password)
 
-            self.logger.info(user)
             user_data = {}
-            user_data['id'] = user['localId']
+            user_data['email'] = email
             user_data['display_name'] = display_name
-            self.mongo.db.user.insert_one(user_data)
+            user_data['address'] = address
+            user_data['city'] = city
+#             user_data['profile_pic'] = ""
+            user_id = self.mongo.db.users.insert_one(user_data).inserted_id
+            user_data['_id'] = str(user_id)
+            
 
-            response_data = {'email': email, 'password': password, 'display_name': display_name,
+            response_data = {'user_id': user_data['_id'], 'name': display_name,
                              'token': user['refreshToken']}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
@@ -45,18 +48,18 @@ class SignUp(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
             return error.get_error_response()
 
-#        except AuthError as e:
-#            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
-#            return error.get_error_response()
+        except Exception as e:
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info (prbably email exsts)')
+            return error.get_error_response()
 
         except pyrebase.pyrebase.HTTPError as e:
             error_message = errorhandler.get_error_message(e)
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, e)
             return error.get_error_response()
 
-#        except Exception as e:
-#            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
-#            return error.get_error_response()
+#         except Exception as e:
+#             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
+#             return error.get_error_response()
 
     def get_firebase(self):
         return self.firebase
@@ -125,10 +128,9 @@ class User(Resource):
             info = {}
             info['display name'] = req_user['display_name']
             info['email'] = req_user['email']
-            info['phone'] = req_user['phone_number']
-            info['uid'] = req_user['uid']
             info['address'] = req_user['address']
             info['city'] = req_user['city']
+#             info['profile_pic']
             
             response_data = {'token': user['refreshToken'], 'user_info': info}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
