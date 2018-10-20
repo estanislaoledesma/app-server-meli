@@ -55,7 +55,7 @@ class SignUp(Resource):
 #             user_data['profile_pic'] = ""
             user_id = str(self.mongo.db.users.insert_one(user_data).inserted_id)
 
-            response_data = {'user_id': user_id, 'name': display_name, 'uid': user_data['uid'],
+            response_data = {'inserted_id': user_id, 'name': display_name, 'uid': user_data['uid'],
                              'token': user['refreshToken']}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
