@@ -17,12 +17,27 @@ class SignUp(Resource):
 
     def post(self):
         json_data = request.get_json(force=True)
-        email = json_data['email']
-        password = json_data['password']
-        display_name = json_data['display_name']
-        address = json_data['address']
-        city = json_data['city']
-        print(email)
+        try:
+            email = json_data['email']
+            password = json_data['password']
+            display_name = json_data['display_name']
+            address = json_data['address']
+            city = json_data['city']
+            phone = json_data['phone']
+            
+            if "" in [email, password, display_name,
+                      address, city, phone]:
+                raise ValueError
+                
+            
+        except KeyError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
+            return error.get_error_response()
+            
+        except ValueError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'You must input all data')
+            return error.get_error_response()
+        
         firebase = self.get_firebase()
 
         auth = firebase.auth()
@@ -34,12 +49,11 @@ class SignUp(Resource):
             user_data['display_name'] = display_name
             user_data['address'] = address
             user_data['city'] = city
+            user_data['phone'] = phone
 #             user_data['profile_pic'] = ""
-            user_id = self.mongo.db.users.insert_one(user_data).inserted_id
-            user_data['_id'] = str(user_id)
-            
+            user_id = str(self.mongo.db.users.insert_one(user_data).inserted_id)
 
-            response_data = {'user_id': user_data['_id'], 'name': display_name,
+            response_data = {'user_id': user_id, 'name': display_name,
                              'token': user['refreshToken']}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
@@ -130,6 +144,7 @@ class User(Resource):
             info['email'] = req_user['email']
             info['address'] = req_user['address']
             info['city'] = req_user['city']
+            info['phone'] = req_user['phone']
 #             info['profile_pic']
             
             response_data = {'token': user['refreshToken'], 'user_info': info}
