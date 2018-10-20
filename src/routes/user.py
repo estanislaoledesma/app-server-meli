@@ -171,3 +171,54 @@ class User(Resource):
             error_message = errorhandler.get_error_message(e)
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
             return error.get_error_response()
+
+    def put(self, user_id):
+        '''solo se actualizan los datos ingresados. Si esta vacio queda igual.
+        No se puede actulizar el mail( (porque esta en firebase)'''
+        try:
+            auth_header = request.headers.get('Authorization')
+            if not auth_header:
+                raise IndexError
+            auth_token = auth_header.split(" ")[TOKEN]
+            auth = self.firebase.auth()
+            user = auth.refresh(auth_token)
+        
+        except IndexError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
+            return error.get_error_response()
+ 
+        except AttributeError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
+            return error.get_error_response()
+        
+        json_data = request.get_json(force=True)
+        display_name = json_data['display_name']
+        address = json_data['address']
+        city = json_data['city']
+        phone = json_data['phone']
+        
+        new_data = {}
+        if display_name: 
+            new_data['display_name'] = display_name
+        if address: 
+            new_data['address'] = address
+        if city: 
+            new_data['city'] = city
+        if phone: 
+            new_data['phone'] = phone
+#             info['profile_pic']
+        try:
+            print(self.mongo.db.users.update_one({"uid": user_id},{'$set': new_data}))
+            
+            response_data = {'token': user['refreshToken'], 'updated_info': new_data}
+            response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
+            return response.get_response()
+        
+        except ValueError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
+            return error.get_error_response()
+ 
+        except pyrebase.pyrebase.HTTPError as e:
+            error_message = errorhandler.get_error_message(e)
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
+            return error.get_error_response()
