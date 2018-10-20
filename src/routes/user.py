@@ -45,7 +45,9 @@ class SignUp(Resource):
             user = auth.create_user_with_email_and_password(email, password)
 
             user_data = {}
+            user_data['uid'] = user['localId']
             user_data['email'] = email
+            user_data['password'] = password
             user_data['display_name'] = display_name
             user_data['address'] = address
             user_data['city'] = city
@@ -53,7 +55,7 @@ class SignUp(Resource):
 #             user_data['profile_pic'] = ""
             user_id = str(self.mongo.db.users.insert_one(user_data).inserted_id)
 
-            response_data = {'user_id': user_id, 'name': display_name,
+            response_data = {'user_id': user_id, 'name': display_name, 'uid': user_data['uid'],
                              'token': user['refreshToken']}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
@@ -137,14 +139,16 @@ class User(Resource):
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
             
-            req_user = self.mongo.db.users.find_one({'_id': ObjectId(user_id)})
-            
+            req_user = self.mongo.db.users.find_one({"uid": user_id})
+
             info = {}
             info['display name'] = req_user['display_name']
             info['email'] = req_user['email']
+            info['password'] = req_user['password']
             info['address'] = req_user['address']
             info['city'] = req_user['city']
             info['phone'] = req_user['phone']
+            info['uid'] = req_user['uid']
 #             info['profile_pic']
             
             response_data = {'token': user['refreshToken'], 'user_info': info}
