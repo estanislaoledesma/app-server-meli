@@ -42,7 +42,6 @@ class Product(Resource):
             product_to_display['ubication'] = product['ubication']
             product_to_display['owner_id'] = product['user_id']
 
-
             response_data = {'token': user['refreshToken'], 'product': product_to_display}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
@@ -73,4 +72,3 @@ class Product(Resource):
     def encode_image(self, image_name):
         image = self.fs.get_last_version(filename=image_name).read()
         return str(base64.b64encode(image), 'utf-8')
-

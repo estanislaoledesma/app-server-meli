@@ -21,25 +21,22 @@ class SignUp(Resource):
             email = json_data['email']
             password = json_data['password']
             display_name = json_data['display_name']
-            address = json_data['address']
-            city = json_data['city']
+#            address = json_data['address']
+#            city = json_data['city']
             phone = json_data['phone']
-            
-            if "" in [email, password, display_name,
-                      address, city, phone]:
+
+            if "" in [email, password, display_name, phone]:
+                      #address, city, phone]:
                 raise ValueError
-                
-            
+
         except KeyError as e:
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
             return error.get_error_response()
-            
         except ValueError as e:
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'You must input all data')
             return error.get_error_response()
-        
-        firebase = self.get_firebase()
 
+        firebase = self.get_firebase()
         auth = firebase.auth()
         try:
             user = auth.create_user_with_email_and_password(email, password)
@@ -49,9 +46,9 @@ class SignUp(Resource):
             user_data['email'] = email
             user_data['password'] = password
             user_data['display_name'] = display_name
-            user_data['address'] = address
-            user_data['city'] = city
             user_data['phone'] = phone
+#            user_data['address'] = address
+#            user_data['city'] = city
 #             user_data['profile_pic'] = ""
             user_id = str(self.mongo.db.users.insert_one(user_data).inserted_id)
 
@@ -59,13 +56,13 @@ class SignUp(Resource):
                              'token': user['refreshToken']}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
-        
+
         except ValueError as e:
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
             return error.get_error_response()
 
         except Exception as e:
-            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info (prbably email exsts)')
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info (prbably email exists)')
             return error.get_error_response()
 
         except pyrebase.pyrebase.HTTPError as e:
@@ -145,12 +142,12 @@ class User(Resource):
             info['display name'] = req_user['display_name']
             info['email'] = req_user['email']
             info['password'] = req_user['password']
-            info['address'] = req_user['address']
-            info['city'] = req_user['city']
             info['phone'] = req_user['phone']
             info['uid'] = req_user['uid']
+#            info['address'] = req_user['address']
+#            info['city'] = req_user['city']
 #             info['profile_pic']
-            
+
             response_data = {'token': user['refreshToken'], 'user_info': info}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
@@ -179,10 +176,11 @@ class User(Resource):
             auth_header = request.headers.get('Authorization')
             if not auth_header:
                 raise IndexError
+
             auth_token = auth_header.split(" ")[TOKEN]
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
-        
+
         except IndexError as e:
             error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
             return error.get_error_response()
@@ -190,26 +188,26 @@ class User(Resource):
         except AttributeError as e:
             error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
             return error.get_error_response()
-        
+
         json_data = request.get_json(force=True)
         display_name = json_data['display_name']
-        address = json_data['address']
-        city = json_data['city']
         phone = json_data['phone']
-        
+#        address = json_data['address']
+#        city = json_data['city']
+
         new_data = {}
         if display_name: 
             new_data['display_name'] = display_name
-        if address: 
-            new_data['address'] = address
-        if city: 
-            new_data['city'] = city
-        if phone: 
+        if phone:
             new_data['phone'] = phone
+#        if address:
+#            new_data['address'] = address
+#        if city:
+#            new_data['city'] = city
 #             info['profile_pic']
         try:
             print(self.mongo.db.users.update_one({"uid": user_id},{'$set': new_data}))
-            
+
             response_data = {'token': user['refreshToken'], 'updated_info': new_data}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
