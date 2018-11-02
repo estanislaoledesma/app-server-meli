@@ -39,8 +39,9 @@ class Products(Resource):
                 product_to_display['_id'] = str(product['_id'])
                 products.append(product_to_display)
 
-            response_data = {'token': user['refreshToken'], 'products': products}
+            response_data = products
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
+            response.add_autentication_header(user['refreshToken'])
             return response.get_response()
 
         except IndexError as e:
