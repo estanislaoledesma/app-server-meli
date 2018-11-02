@@ -45,22 +45,23 @@ class Product(Resource):
             product_to_display['ubication'] = product['ubication']
             product_to_display['owner_id'] = product['user_id']
 
-            response_data = {'token': user['refreshToken'], 'product': product_to_display}
+            response_data = {product_to_display}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
+            response.add_autentication_header(user['refreshToken'])
             return response.get_response()
 
         except IndexError as e:
             error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
             return error.get_error_response()
 
-#        except pyrebase.pyrebase.HTTPError as e:
-#            error_message = errorhandler.get_error_message(e)
-#            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
-#            return error.get_error_response()
+        except pyrebase.pyrebase.HTTPError as e:
+            error_message = errorhandler.get_error_message(e)
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
+            return error.get_error_response()
 
-#        except pymongo.errors.PyMongoError as e:
-#            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
-#            return error.get_error_response()
+        except pymongo.errors.PyMongoError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
+            return error.get_error_response()
 
     def encode_images(self, images_name):
         l = []
