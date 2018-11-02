@@ -52,27 +52,24 @@ class SignUp(Resource):
 #             user_data['profile_pic'] = ""
             user_id = str(self.mongo.db.users.insert_one(user_data).inserted_id)
 
-            response_data = {'inserted_id': user_id, 'name': display_name, 'uid': user_data['uid'],
-                             'token': user['refreshToken']}
-            response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
+#            response_data = {'email': email, 'password': password, 'display_name': display_name,
+#                             'phone': phone, 'token': user['refreshToken']}
+            response = responsehandler.ResponseHandler(status.HTTP_200_OK, {})
+            response.add_autentication_header(user['refreshToken'])
             return response.get_response()
 
         except ValueError as e:
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
             return error.get_error_response()
 
-#        except Exception as e:
-#            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info (prbably email exists)')
-#            return error.get_error_response()
-
         except pyrebase.pyrebase.HTTPError as e:
             error_message = errorhandler.get_error_message(e)
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, e)
             return error.get_error_response()
 
-#         except Exception as e:
-#             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
-#             return error.get_error_response()
+#        except Exception as e:
+#            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info (prbably email exists)')
+#            return error.get_error_response()
 
     def get_firebase(self):
         return self.firebase

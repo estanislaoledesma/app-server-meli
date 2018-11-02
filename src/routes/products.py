@@ -13,7 +13,6 @@ THUMBNAIL = 0
 
 class Products(Resource):
 
-
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
         self.mongo = kwargs.get('mongo')

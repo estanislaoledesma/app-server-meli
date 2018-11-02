@@ -8,3 +8,6 @@ class ResponseHandler(object):
 
     def get_response(self):
         return self.response
+
+    def add_autentication_header(self, token):
+        self.response.headers['Bearer'] = token
