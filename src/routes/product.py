@@ -27,6 +27,7 @@ class Product(Resource):
             user = auth.refresh(auth_token)
 
             product = self.mongo.db.products.find_one({'_id': ObjectId(product_id)})
+            self.logger.info('product : %s', product)
 
             product_to_display = {}
             product_to_display['_id'] = str(product['_id'])
@@ -37,7 +38,9 @@ class Product(Resource):
             product_to_display['category'] = product['category']
             product_to_display['units'] = product['units']
 
-            user_data = self.mongo.db.users.find_one({"id": user['userId']})
+            self.logger.info('user : %s', user)
+            user_data = self.mongo.db.users.find_one({"uid": user['userId']})
+            self.logger.info('user data : %s', user_data)
             product_to_display['display_name'] = user_data['display_name']
             product_to_display['ubication'] = product['ubication']
             product_to_display['owner_id'] = product['user_id']
