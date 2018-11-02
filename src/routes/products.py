@@ -11,6 +11,7 @@ from bson import ObjectId
 TOKEN = 1
 THUMBNAIL = 0
 
+
 class Products(Resource):
 
     def __init__(self, **kwargs):
@@ -62,11 +63,6 @@ class Products(Resource):
         except Exception as e:
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
             return error.get_error_response()
-
-    def encode_image(self, image_name):
-        image = self.fs.get_last_version(filename=image_name).read()
-        return str(base64.b64encode(image), 'utf-8')
-
 
     def post(self):
         try:
@@ -130,3 +126,7 @@ class Products(Resource):
             i+=1
 
         return images
+
+    def encode_image(self, image_name):
+        image = self.fs.get_last_version(filename=image_name).read()
+        return str(base64.b64encode(image), 'utf-8')

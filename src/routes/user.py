@@ -21,16 +21,16 @@ class SignUp(Resource):
             email = json_data['email']
             password = json_data['password']
             display_name = json_data['display_name']
+            phone = json_data['phone']
 #            address = json_data['address']
 #            city = json_data['city']
-            phone = json_data['phone']
 
             if "" in [email, password, display_name, phone]:
                       #address, city, phone]:
                 raise ValueError
 
         except KeyError as e:
-            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'You must input all data')
             return error.get_error_response()
         except ValueError as e:
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'You must input all data')
@@ -67,9 +67,9 @@ class SignUp(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, e)
             return error.get_error_response()
 
-#        except Exception as e:
-#            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info (prbably email exists)')
-#            return error.get_error_response()
+        except Exception as e:
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info (prbably email exists)')
+            return error.get_error_response()
 
     def get_firebase(self):
         return self.firebase
@@ -85,20 +85,20 @@ class Login(Resource):
         json_data = request.get_json(force=True)
         email = json_data['email']
         password = json_data['password']
-        
+
         auth = self.get_firebase().auth()
         try:
             user = auth.sign_in_with_email_and_password(email, password)
 
-            response_data = {'email': email, 'password': password, 'token': user['refreshToken']}
-            response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
+            response = responsehandler.ResponseHandler(status.HTTP_200_OK, {})
+            response.add_autentication_header(user['refreshToken'])
             return response.get_response()
 
         except pyrebase.pyrebase.HTTPError as e:
             error_message = errorhandler.get_error_message(e)
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
             return error.get_error_response()
-        
+
         except ValueError as e:
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
             return error.get_error_response()
@@ -132,7 +132,7 @@ class User(Resource):
             auth_token = auth_header.split(" ")[TOKEN]
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
-            
+
             req_user = self.mongo.db.users.find_one({"uid": user_id})
 
             info = {}
