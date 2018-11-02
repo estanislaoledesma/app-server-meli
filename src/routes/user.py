@@ -52,9 +52,8 @@ class SignUp(Resource):
 #             user_data['profile_pic'] = ""
             user_id = str(self.mongo.db.users.insert_one(user_data).inserted_id)
 
-#            response_data = {'email': email, 'password': password, 'display_name': display_name,
-#                             'phone': phone, 'token': user['refreshToken']}
-            response = responsehandler.ResponseHandler(status.HTTP_200_OK, {})
+            response_data = {'userId': user['localId']}
+            response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
             return response.get_response()
 
@@ -89,8 +88,10 @@ class Login(Resource):
         auth = self.get_firebase().auth()
         try:
             user = auth.sign_in_with_email_and_password(email, password)
+            self.logger.info('user : %s', user)
 
-            response = responsehandler.ResponseHandler(status.HTTP_200_OK, {})
+            response_data = {'userId': user['localId']}
+            response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
             return response.get_response()
 
