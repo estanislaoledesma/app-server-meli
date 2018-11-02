@@ -92,8 +92,8 @@ class Products(Resource):
             product_id = self.mongo.db.products.insert_one(product_to_publish).inserted_id
             product_to_publish ['_id'] = str(product_id)
 
-            response_data = {'token': user['refreshToken'], 'product': product_to_publish}
-            response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
+            response = responsehandler.ResponseHandler(status.HTTP_200_OK, {})
+            response.add_autentication_header(user['refreshToken'])
             return response.get_response()
 
         except IndexError as e:
