@@ -114,14 +114,14 @@ class Login(Resource):
 
     def get_firebase(self):
         return self.firebase
-    
+
 class User(Resource):
 
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
         self.firebase = kwargs.get('firebase')
         self.mongo = kwargs.get('mongo')
-        
+
     def get_firebase(self):
         return self.firebase
 
@@ -135,6 +135,7 @@ class User(Resource):
             user = auth.refresh(auth_token)
 
             req_user = self.mongo.db.users.find_one({"uid": user_id})
+            self.logger.info('user : %s', req_user)
 
             info = {}
             info['display name'] = req_user['display_name']
@@ -146,8 +147,9 @@ class User(Resource):
 #            info['city'] = req_user['city']
 #             info['profile_pic']
 
-            response_data = {'token': user['refreshToken'], 'user_info': info}
+            response_data = info
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
+            response.add_autentication_header(user['refreshToken'])
             return response.get_response()
         
         except ValueError as e:
