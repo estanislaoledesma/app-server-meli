@@ -138,7 +138,7 @@ class User(Resource):
             self.logger.info('user : %s', req_user)
 
             info = {}
-            info['display name'] = req_user['display_name']
+            info['display_name'] = req_user['display_name']
             info['email'] = req_user['email']
             info['password'] = req_user['password']
             info['phone'] = req_user['phone']
