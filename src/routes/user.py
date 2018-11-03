@@ -22,11 +22,8 @@ class SignUp(Resource):
             password = json_data['password']
             display_name = json_data['display_name']
             phone = json_data['phone']
-#            address = json_data['address']
-#            city = json_data['city']
 
             if "" in [email, password, display_name, phone]:
-                      #address, city, phone]:
                 raise ValueError
 
         except KeyError as e:
@@ -47,9 +44,6 @@ class SignUp(Resource):
             user_data['password'] = password
             user_data['display_name'] = display_name
             user_data['phone'] = phone
-#            user_data['address'] = address
-#            user_data['city'] = city
-#             user_data['profile_pic'] = ""
             user_id = str(self.mongo.db.users.insert_one(user_data).inserted_id)
 
             response_data = {'userId': user['localId']}
@@ -104,10 +98,6 @@ class Login(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
             return error.get_error_response()
 
-#        except AuthError as e:
-#            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
-#            return error.get_error_response()
-
         except Exception as e:
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
             return error.get_error_response()
@@ -143,10 +133,6 @@ class User(Resource):
             info['password'] = req_user['password']
             info['phone'] = req_user['phone']
             info['uid'] = req_user['uid']
-#            info['address'] = req_user['address']
-#            info['city'] = req_user['city']
-#             info['profile_pic']
-
             response_data = info
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
@@ -192,19 +178,12 @@ class User(Resource):
         json_data = request.get_json(force=True)
         display_name = json_data['display_name']
         phone = json_data['phone']
-#        address = json_data['address']
-#        city = json_data['city']
 
         new_data = {}
         if display_name: 
             new_data['display_name'] = display_name
         if phone:
             new_data['phone'] = phone
-#        if address:
-#            new_data['address'] = address
-#        if city:
-#            new_data['city'] = city
-#             info['profile_pic']
         try:
             print(self.mongo.db.users.update_one({"uid": user_id},{'$set': new_data}))
 

@@ -32,11 +32,12 @@ class Products(Resource):
 
             products = []
             for product in products_cursor:
+                self.logger.info(product)
                 product_to_display = {}
-                product_to_display['name'] = product['name']
-                product_to_display['price'] = product['price']
-                product_to_display['thumbnail'] = self.encode_image(product['images'][THUMBNAIL])
-                product_to_display['_id'] = str(product['_id'])
+                product_to_display ['name'] = product ['name']
+                product_to_display ['price'] = product ['price']
+                #product_to_display ['thumbnail'] = self.encode_image(product ['images'] [THUMBNAIL])
+                product_to_display ['_id'] = str(product ['_id'])
                 products.append(product_to_display)
 
             response_data = products
@@ -58,10 +59,12 @@ class Products(Resource):
             return error.get_error_response()
 
         except pymongo.errors.PyMongoError as e:
+            self.logger.info(e)
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
             return error.get_error_response()
 
         except Exception as e:
+            self.logger.info(e)
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
             return error.get_error_response()
 
@@ -74,26 +77,23 @@ class Products(Resource):
             user = auth.refresh(auth_token)
 
             json_data = request.get_json(force=True)
-#            self.logger.info(json_data)
             product = json_data['product']
 
-#            self.logger.info(  self.mongo.db.user.find_one({"id": user['userId']})['display_name']  )
-
             product_to_publish = {}
-            product_to_publish ['name'] = product['name']
-            product_to_publish ['description'] = product['description']
-            product_to_publish['images'] = self.decoded_images(product['images'], product['name'])
-            product_to_publish ['price'] = product['price']
-            product_to_publish['category'] = product['category']
-            product_to_publish['ubication'] = product['ubication']
-            product_to_publish['units'] = product['units']
-            product_to_publish['user_id'] = user['userId']
+            product_to_publish ['name'] = product ['name']
+            product_to_publish ['description'] = product ['description']
+            product_to_publish ['images'] = self.decoded_images(product ['images'], product ['name'])
+            product_to_publish ['price'] = product ['price']
+            product_to_publish ['category'] = product ['category']
+            product_to_publish ['ubication'] = product ['ubication']
+            product_to_publish ['units'] = product ['units']
+            product_to_publish ['user_id'] = user ['userId']
 
             product_id = self.mongo.db.products.insert_one(product_to_publish).inserted_id
             product_to_publish ['_id'] = str(product_id)
 
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, {})
-            response.add_autentication_header(user['refreshToken'])
+            response.add_autentication_header(user ['refreshToken'])
             return response.get_response()
 
         except IndexError as e:
