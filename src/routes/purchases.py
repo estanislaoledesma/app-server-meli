@@ -8,12 +8,12 @@ from bson.objectid import ObjectId
 
 TOKEN = 1
 
-class Purchase(Resource):
+class Purchases(Resource):
 
     PURCHASE_CHECKOUT = 0
-    PURCHASE_PAYMENT = 2
-    PURCHASE_CHECK_PAYMENT = 3
-    PURCHASE_COMPLETED = 4
+    PURCHASE_PAYMENT = 1
+    PURCHASE_CHECK_PAYMENT = 2
+    PURCHASE_COMPLETED = 3
 
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
@@ -46,7 +46,7 @@ class Purchase(Resource):
             purchase['product_id'] = str(product['_id'])
             purchase['user_id'] = user['userId']
             purchase['units'] = units
-            purchase['purchas_state'] = self.PURCHASE_CHECKOUT
+            purchase['state'] = self.PURCHASE_CHECKOUT
 
             purchase_id = self.mongo.db.purchases.insert_one(purchase).inserted_id
 

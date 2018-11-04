@@ -5,7 +5,7 @@ from flask import Flask
 from flask_restful import Api
 from flask_marshmallow import Marshmallow
 from flask_pymongo import PyMongo
-from src.routes import hello, user, products, product, purchase
+from src.routes import hello, user, products, product, purchases, payments
 from .config import Config
 import logging
 import pyrebase
@@ -38,4 +38,5 @@ api.add_resource(user.Login, '/users/login', resource_class_kwargs={'logger': ap
 api.add_resource(user.User, '/users/<user_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(products.Products, '/products', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(product.Product, '/products/<product_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
-api.add_resource(purchase.Purchase, '/products/<product_id>/purchases', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
+api.add_resource(purchases.Purchases, '/products/<product_id>/purchases', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
+api.add_resource(payments.Payments, '/purchases/<purchase_id>/payments', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
