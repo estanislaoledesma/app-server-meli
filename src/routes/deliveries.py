@@ -66,6 +66,7 @@ class Deliveries(Resource):
             delivery ['start'] = origin_endpoint
             delivery ['end'] = destination_endpoint
             delivery ['distance'] = distance
+            delivery ['value'] = purchase ['value']
             delivery ['route'] = ''
             delivery ['cost'] = {'currency': product ['currency'], 'value': 0}
 
@@ -164,6 +165,7 @@ class Deliveries(Resource):
             delivery ['start'] = origin_endpoint
             delivery ['end'] = destination_endpoint
             delivery ['distance'] = distance
+            delivery ['value'] = distance
             delivery ['route'] = ''
             delivery ['cost'] = {'currency': product ['currency'], 'value': 0}
 

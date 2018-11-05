@@ -46,3 +46,4 @@ api.add_resource(purchases.Purchases, '/products/<product_id>/purchases', resour
 api.add_resource(payments.Payments, '/purchases/<purchase_id>/payments', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(deliveries.Deliveries, '/purchases/<purchase_id>/deliveries', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'gmaps': gmaps})
 api.add_resource(trackings.Trackings, '/purchases/<purchase_id>/trackings', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'gmaps': gmaps})
+api.add_resource(trackings.Trackings, '/products/<product_id>/questions', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})

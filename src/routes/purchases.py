@@ -48,7 +48,7 @@ class Purchases(Resource):
                 purchase_to_display ['product_name'] = product ['name']
                 purchase_to_display ['units'] = purchase ['units']
                 purchase_to_display ['currency'] = purchase ['currency']
-                purchase_to_display ['price'] = purchase['price']
+                purchase_to_display ['value'] = purchase['price']
                 purchase_to_display ['state'] = self.PURCHASE_STATES [purchase ['state']]
                 purchase_to_display ['_id'] = str(purchase ['_id'])
                 purchases.append(purchase_to_display)
@@ -109,7 +109,7 @@ class Purchases(Resource):
             purchase ['units'] = units
             purchase ['state'] = self.PURCHASE_CHECKOUT
             purchase ['currency'] = product ['currency']
-            purchase ['price'] = units * product ['price']
+            purchase ['value'] = units * product ['price']
 
             purchase_id = self.mongo.db.purchases.insert_one(purchase).inserted_id
 
