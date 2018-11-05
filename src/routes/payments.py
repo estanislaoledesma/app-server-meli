@@ -9,9 +9,9 @@ from . import purchases
 
 TOKEN = 1
 
-PAYEMENTS_URL = "http://localhost:8080/payments"
-
 class Payments(Resource):
+
+    PAYEMENTS_URL = "http://localhost:8080/payments"
 
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
@@ -58,7 +58,7 @@ class Payments(Resource):
 
             payment ['transaction_id'] = str(payment_id)
 
-            response = requests.post(url = PAYEMENTS_URL, params = payment)
+            response = requests.post(url = self.PAYEMENTS_URL, params = payment)
 
             if response.status_code != status.HTTP_201_CREATED:
                 error_message = response.reason

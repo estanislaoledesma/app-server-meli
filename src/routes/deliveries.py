@@ -10,10 +10,10 @@ import datetime
 
 TOKEN = 1
 
-DELIVERIES_URL = "http://localhost:8080/deliveries/estimate"
-TRACKING_URL = "http://localhost:8080/trackings"
-
 class Deliveries(Resource):
+
+    DELIVERIES_URL = "http://localhost:8080/deliveries/estimate"
+    TRACKING_URL = "http://localhost:8080/tracking"
 
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
@@ -41,7 +41,7 @@ class Deliveries(Resource):
             self.logger.info('product : %s', product)
 
             purchase_state = purchase ['state']
-            if (purchase_state > purchases.Purchases.PURCHASE_CHECKOUT_DELIVERY):
+            if (purchase_state > purchases.Purchases.PURCHASE_CHECKOUT):
                 error = errorhandler.ErrorHandler(status.HTTP_409_CONFLICT, 'Ya se estableció una entrega.')
                 return error.get_error_response()
 
@@ -73,7 +73,7 @@ class Deliveries(Resource):
 
             delivery ['id'] = str(delivery_id)
 
-            response = requests.post(url = DELIVERIES_URL, params = delivery)
+            response = requests.post(url = self.DELIVERIES_URL, params = delivery)
 
             if response.status_code != status.HTTP_200_OK:
                 error_message = response.reason
@@ -90,14 +90,14 @@ class Deliveries(Resource):
             tracking ['status'] = ""
             tracking ['updateAt'] = 0
 
-            response = requests.post(url = TRACKING_URL, params = tracking)
+            response = requests.post(url = self.TRACKING_URL, params = tracking)
 
             if response.status_code != status.HTTP_201_CREATED:
                 error_message = response.reason
                 error = errorhandler.ErrorHandler(status.HTTP_503_SERVICE_UNAVAILABLE, error_message)
                 return error.get_error_response()
 
-            purchase_update = {'delivery_id': str(delivery_id)}
+            purchase_update = {'delivery_id': str(delivery_id), 'status': purchases.Purchases.PURCHASE_CHECKOUT_DELIVERY}
             self.mongo.db.purchases.update_one({'_id': ObjectId(purchase_id)}, {'$set': purchase_update})
 
             response_data  = response.json()
