@@ -8,14 +8,14 @@ from bson import ObjectId
 
 TOKEN = 1
 
-class Question(Resource):
+class Answers(Resource):
 
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
         self.mongo = kwargs.get('mongo')
         self.firebase = kwargs.get('firebase')
 
-    def get(self, product_id):
+    def get(self, question_id):
         try:
             # Authentication
             auth_header = request.headers.get('Authorization')
@@ -23,18 +23,18 @@ class Question(Resource):
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
 
-            questions_cursor = self.mongo.db.questions.find({'product_id': ObjectId(product_id)})
+            answers_cursor = self.mongo.db.answers.find({'question_id': ObjectId(question_id)})
 
-            questions = []
-            for question in questions_cursor:
-                self.logger.info(question)
-                question_to_display = {}
-                question_to_display ['question'] = question ['question']
-                question_to_display ['user_id'] = question ['user_id']
-                question_to_display['_id'] = str(question ['_id'])
-                questions.append(question_to_display)
+            answers = []
+            for answer in answers_cursor:
+                self.logger.info(answer)
+                answer_to_display = {}
+                answer_to_display ['answer'] = answer ['answer']
+                answer_to_display ['user_id'] = answer ['user_id']
+                answer_to_display['_id'] = str(answer ['_id'])
+                answers.append(answer_to_display)
 
-            response_data = questions
+            response_data = answers
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
             return response.get_response()
@@ -63,7 +63,7 @@ class Question(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
             return error.get_error_response()
 
-    def post(self, product_id):
+    def post(self, question_id):
         try:
             # Authentication
             auth_header = request.headers.get('Authorization')
@@ -71,21 +71,21 @@ class Question(Resource):
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
 
-            product = self.mongo.db.products.find_one({'_id': ObjectId(product_id)})
-            self.logger.info('product : %s', product)
+            question = self.mongo.db.questions.find_one({'_id': ObjectId(question_id)})
+            self.logger.info('question : %s', question)
 
             json_data = request.get_json(force=True)
-            question_str = json_data ['question']
+            answer_str = json_data ['question']
 
-            question = {}
-            question ['product_id'] = str(product_id)
-            question ['user_id'] = user ['userId']
-            question ['question'] = question_str
+            answer = {}
+            answer ['question_id'] = str(question_id)
+            answer ['user_id'] = user ['userId']
+            answer ['answer'] = answer_str
 
-            question_id = self.mongo.db.questions.insert_one(question).inserted_id
-            question ['_id'] = str(question_id)
+            answer_id = self.mongo.db.answers.insert_one(answer).inserted_id
+            answer ['_id'] = str(answer_id)
 
-            response_data = question
+            response_data = answer
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user ['refreshToken'])
             return response.get_response()
