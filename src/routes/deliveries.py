@@ -69,7 +69,7 @@ class Deliveries(Resource):
             delivery ['route'] = ''
             delivery ['cost'] = {'currency': product ['currency'], 'value': 0}
 
-            delivery_id = self.mongo.db.payments.insert_one(delivery).inserted_id
+            delivery_id = self.mongo.db.deliveries.insert_one(delivery).inserted_id
 
             delivery ['id'] = str(delivery_id)
 
@@ -83,7 +83,7 @@ class Deliveries(Resource):
             cost = response.json() ['value']
             delivery ['cost'] ['value'] = cost
 
-            self.mongo.db.purchases.update_one({'_id': ObjectId(delivery_id)}, {'$set': delivery})
+            self.mongo.db.deliveries.update_one({'_id': ObjectId(delivery_id)}, {'$set': delivery})
 
             tracking = {}
             tracking ['id'] = str(delivery_id)
@@ -96,6 +96,9 @@ class Deliveries(Resource):
                 error_message = response.reason
                 error = errorhandler.ErrorHandler(status.HTTP_503_SERVICE_UNAVAILABLE, error_message)
                 return error.get_error_response()
+
+            purchase_update = {'delivery_id': str(delivery_id)}
+            self.mongo.db.purchases.update_one({'_id': ObjectId(purchase_id)}, {'$set': purchase_update})
 
             response_data  = response.json()
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
