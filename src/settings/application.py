@@ -5,7 +5,7 @@ from flask import Flask
 from flask_restful import Api
 from flask_marshmallow import Marshmallow
 from flask_pymongo import PyMongo
-from src.routes import hello, user, products, product, purchases, payments
+from src.routes import hello, user, products, product, purchases, payments, deliveries, trackings
 from .config import Config
 import logging
 import pyrebase
@@ -45,3 +45,4 @@ api.add_resource(product.Product, '/products/<product_id>', resource_class_kwarg
 api.add_resource(purchases.Purchases, '/products/<product_id>/purchases', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(payments.Payments, '/purchases/<purchase_id>/payments', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(deliveries.Deliveries, '/purchases/<purchase_id>/deliveries', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'gmaps': gmaps})
+api.add_resource(trackings.Trackings, '/purchases/<purchase_id>/trackings', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'gmaps': gmaps})
