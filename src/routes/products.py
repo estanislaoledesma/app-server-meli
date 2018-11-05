@@ -14,6 +14,8 @@ THUMBNAIL = 0
 
 class Products(Resource):
 
+    CURRENCY = 'ARS'
+
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
         self.mongo = kwargs.get('mongo')
@@ -86,8 +88,11 @@ class Products(Resource):
             product_to_publish ['price'] = product ['price']
             product_to_publish ['category'] = product ['category']
             product_to_publish ['ubication'] = product ['ubication']
+            product_to_publish ['latitude'] = product ['latitude']
+            product_to_publish ['longitude'] = product ['longitude']
             product_to_publish ['units'] = product ['units']
             product_to_publish ['user_id'] = user ['userId']
+            product_to_publish ['currency'] = self.CURRENCY
 
             product_id = self.mongo.db.products.insert_one(product_to_publish).inserted_id
             product_to_publish ['_id'] = str(product_id)

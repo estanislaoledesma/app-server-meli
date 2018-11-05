@@ -3,11 +3,13 @@ from flask_restful import Resource
 from flask import request
 from ..settings import errorhandler, responsehandler
 from flask_api import status
-import pyrebase, pymongo
+import pyrebase, pymongo, requests
 from bson.objectid import ObjectId
 from . import purchases
 
 TOKEN = 1
+
+PAYEMENTS_URL = "http://localhost:8080/payments"
 
 class Payments(Resource):
 
@@ -25,29 +27,43 @@ class Payments(Resource):
             user = auth.refresh(auth_token)
 
             json_data = request.get_json(force=True)
-            payment_method = json_data ['payment_method']
+            method = json_data ['payment_method']
             card_number = json_data ['card_number']
             card_cvc = json_data['card_cvc']
-            card_expiry_date = json_data['card_expiry_date']
+            card_expiration_year = json_data['card_expiration_year']
+            card_expiration_month = json_data['card_expiration_month']
             card_holder = json_data['card_holder']
 
             purchase = self.mongo.db.purchases.find_one({'_id': ObjectId(purchase_id)})
             self.logger.info('purchase : %s', purchase)
 
             purchase_state = purchase ['state']
-            if (purchase_state > purchases.Purchases.PURCHASE_CHECKOUT):
+            if (purchase_state > purchases.Purchases.PURCHASE_CHECKOUT_DELIVERY):
                 error = errorhandler.ErrorHandler(status.HTTP_409_CONFLICT, 'El pago de la compra ya fue realizado.')
                 return error.get_error_response()
 
+            payment_method = {}
+            payment_method ['expiration_month'] = card_expiration_month
+            payment_method ['expiration_year'] = card_expiration_year
+            payment_method ['method'] = method
+            payment_method ['number'] = card_number
+            payment_method ['type'] = method
+
             payment = {}
-            payment['purchase_id'] = purchase_id
-            payment['payment_method'] = payment_method
-            payment['card_number'] = card_number
-            payment['card_cvc'] = card_cvc
-            payment['card_expiry_date'] = card_expiry_date
-            payment['card_holder'] = card_holder
+            payment ['currency'] = purchase ['currency']
+            payment ['value'] = purchase ['price']
+            payment ['paymentMethod'] = payment_method
 
             payment_id = self.mongo.db.payments.insert_one(payment).inserted_id
+
+            payment ['transaction_id'] = str(payment_id)
+
+            response = requests.post(url = PAYEMENTS_URL, params = payment)
+
+            if response.status_code != status.HTTP_201_CREATED:
+                error_message = response.reason
+                error = errorhandler.ErrorHandler(status.HTTP_503_SERVICE_UNAVAILABLE, error_message)
+                return error.get_error_response()
 
             purchase_update = {'state': purchases.Purchases.PURCHASE_PAYMENT, 'payment_id': str(payment_id)}
             self.mongo.db.purchases.update_one({'_id': ObjectId(purchase_id)}, {'$set': purchase_update})

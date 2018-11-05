@@ -9,6 +9,8 @@ from src.routes import hello, user, products, product, purchases, payments
 from .config import Config
 import logging
 import pyrebase
+import googlemaps
+from datetime import datetime
 
 app = Flask(__name__)
 api = Api(app)
@@ -26,6 +28,8 @@ app.config['MONGO_URI'] = MONGO_URL
 mongo = PyMongo(app)
 db = mongo.db
 
+gmaps = googlemaps.Client(key = 'AIzaSyDd_fCIYbz8xiusm7RjuTHZBzuSlL-UAtw')
+
 # Configuracion del logger
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
@@ -40,3 +44,4 @@ api.add_resource(products.Products, '/products', resource_class_kwargs={'logger'
 api.add_resource(product.Product, '/products/<product_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(purchases.Purchases, '/products/<product_id>/purchases', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(payments.Payments, '/purchases/<purchase_id>/payments', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
+api.add_resource(deliveries.Deliveries, '/purchases/<purchase_id>/deliveries', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'gmaps': gmaps})
