@@ -8,7 +8,7 @@ from bson import ObjectId
 
 TOKEN = 1
 
-class Question(Resource):
+class Questions(Resource):
 
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')

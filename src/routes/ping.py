@@ -3,7 +3,7 @@ from flask import jsonify
 from ..settings import responsehandler
 from flask_api import status
 
-class HelloWorld(Resource):
+class Ping(Resource):
 
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')

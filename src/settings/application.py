@@ -6,7 +6,7 @@ from flask_restful import Api
 from flask_marshmallow import Marshmallow
 from flask_pymongo import PyMongo
 from src.routes import hello, user, products, product, purchases, payments, deliveries, trackings, questions, answers, \
-    search
+    search, ping
 from .config import Config
 import logging
 import pyrebase
@@ -50,3 +50,4 @@ api.add_resource(trackings.Trackings, '/purchases/<purchase_id>/trackings', reso
 api.add_resource(questions.Questions, '/products/<product_id>/questions', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(answers.Answers, '/questions/<question_id>/answers', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(search.Search, '/products/search', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'gmaps': gmaps})
+api.add_resource(ping.Ping, '/ping', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})

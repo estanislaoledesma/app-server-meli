@@ -9,7 +9,7 @@ from . import purchases
 
 TOKEN = 1
 
-class Deliveries(Resource):
+class Trackings(Resource):
 
     TRACKING_URL = "http://localhost:8080/tracking/"
 
