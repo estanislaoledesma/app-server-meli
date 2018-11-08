@@ -62,6 +62,13 @@ class Deliveries(Resource):
             origin_endpoint = {'location': origin_address, 'timestamp': datetime.datetime.now()}
             destination_endpoint = {'location': destination_address, 'timestamp': datetime.datetime.now()}
 
+            user_data = self.mongo.db.users.find_one({'_id': ObjectId(user ['userId'])})
+            self.logger.info('user : %s', product)
+
+            purchase_list = self.mongo.db.purchases.find_one({'user_id': ObjectId(user ['userId'])})
+            self.logger.info('purchase list : %s', purchase_list)
+            purchase_amount = purchase_list.count(True)
+
             delivery = {}
             delivery ['applicationOwner'] = user ['userId']
             delivery ['start'] = origin_endpoint
@@ -70,6 +77,9 @@ class Deliveries(Resource):
             delivery ['value'] = purchase ['value']
             delivery ['route'] = ''
             delivery ['cost'] = {'currency': product ['currency'], 'value': 0}
+            delivery ['userscore'] = 0
+            delivery ['mail'] = user_data ['email']
+            delivery ['purchaseQuantity'] = purchase_amount
 
             delivery_id = self.mongo.db.deliveries.insert_one(delivery).inserted_id
 
@@ -165,6 +175,13 @@ class Deliveries(Resource):
             origin_endpoint = {'location': origin_address, 'timestamp': datetime.datetime.now()}
             destination_endpoint = {'location': destination_address, 'timestamp': datetime.datetime.now()}
 
+            user_data = self.mongo.db.users.find_one({'_id': ObjectId(user['userId'])})
+            self.logger.info('user : %s', product)
+
+            purchase_list = self.mongo.db.purchases.find_one({'user_id': ObjectId(user['userId'])})
+            self.logger.info('purchase list : %s', purchase_list)
+            purchase_amount = purchase_list.count(True)
+
             delivery = {}
             delivery['id'] = 0
             delivery ['applicationOwner'] = user ['userId']
@@ -174,6 +191,10 @@ class Deliveries(Resource):
             delivery ['value'] = distance
             delivery ['route'] = ''
             delivery ['cost'] = {'currency': product ['currency'], 'value': 0}
+            delivery ['userscore'] = 0
+            delivery ['mail'] = user_data ['email']
+            delivery ['purchaseQuantity'] = purchase_amount
+
 
             response = requests.post(url = self.DELIVERIES_URL, params = delivery)
 
