@@ -51,7 +51,7 @@ class Trackings(Resource):
 
             response_data = response.json()
 
-            purchase_update = {'status': response_data ['status']}
+            purchase_update = {'state': purchases.Purchases.get_purchase_state(response_data ['status'])}
             self.mongo.db.purchases.update_one({'_id': ObjectId(purchase_id)}, {'$set': purchase_update})
 
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)

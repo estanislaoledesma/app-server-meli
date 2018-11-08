@@ -8,6 +8,11 @@ from bson.objectid import ObjectId
 
 TOKEN = 1
 
+
+class InvalidStateException(Exception):
+    pass
+
+
 class Purchases(Resource):
 
     PURCHASE_CHECKOUT = 0
@@ -19,10 +24,13 @@ class Purchases(Resource):
     PURCHASE_DELIVERY_IN_PROGRESS = 6
     PURCHASE_DELIVERED = 7
 
-    PURCHASE_STATES = {PURCHASE_CHECKOUT: 'Checkout', PURCHASE_CHECKOUT_DELIVERY: 'Delivery Checkout',
+    PURCHASE_STATES = {PURCHASE_CHECKOUT: 'Checkout',
+                       PURCHASE_CHECKOUT_DELIVERY: 'Delivery Checkout',
                        PURCHASE_PENDING_PAYMENT_PROCESS: 'Pago pendiente de proceso',
-                       PURCHASE_PAYMENT_ACCEPTED: 'Pago Aceptado', PURCHASE_PAYMENT_REJECTED: 'Pago Rechazado',
-                       PURCHASE_PENDING_DELIVERY: 'Entrega Pendiente', PURCHASE_DELIVERY_IN_PROGRESS: 'Entrega en proceso',
+                       PURCHASE_PAYMENT_ACCEPTED: 'Pago Aceptado',
+                       PURCHASE_PAYMENT_REJECTED: 'Pago Rechazado',
+                       PURCHASE_PENDING_DELIVERY: 'Entrega Pendiente',
+                       PURCHASE_DELIVERY_IN_PROGRESS: 'Entrega en proceso',
                        PURCHASE_DELIVERED: 'Entrega Realizada'}
 
     def __init__(self, **kwargs):
@@ -131,3 +139,10 @@ class Purchases(Resource):
         except pymongo.errors.PyMongoError as e:
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
             return error.get_error_response()
+
+    @classmethod
+    def get_purchase_state(self, state_str):
+        for state_key, state_val in self.PURCHASE_STATES.items():
+            if state_str == state_val:
+                return state_key
+        raise InvalidStateException
