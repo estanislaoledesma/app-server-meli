@@ -34,7 +34,7 @@ class Product(Resource):
             product_to_display ['name'] = product ['name']
             product_to_display ['description'] = product ['description']
             product_to_display ['price'] = product ['price']
-            product_to_display ['currency'] = product ['currency']
+#            product_to_display ['currency'] = product ['currency']
             product_to_display ['images'] = self.encode_images(product ['images'])
             product_to_display ['category'] = product ['category']
             product_to_display ['units'] = product ['units']
