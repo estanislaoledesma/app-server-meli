@@ -23,7 +23,7 @@ class Answers(Resource):
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
 
-            answers_cursor = self.mongo.db.answers.find({'question_id': ObjectId(question_id)})
+            answers_cursor = self.mongo.db.answers.find({'question_id': question_id})
 
             answers = []
             for answer in answers_cursor:
@@ -75,7 +75,7 @@ class Answers(Resource):
             self.logger.info('question : %s', question)
 
             json_data = request.get_json(force=True)
-            answer_str = json_data ['question']
+            answer_str = json_data ['answer']
 
             answer = {}
             answer ['question_id'] = str(question_id)

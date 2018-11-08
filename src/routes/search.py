@@ -40,8 +40,7 @@ class Search(Resource):
             search_latitude = args ['latitude']
             search_longitude = args['longitude']
 
-            products_cursor = self.mongo.db.products.find({'name': {'$regex':'/.*' + search_name + '.*/'},
-                                                           'description' : {'$regex':'/.*' + search_description + '.*/'}})
+            products_cursor = self.mongo.db.products.find({'name': {'$regex': '.*' + search_name + '.*', '$options': 'i'}, 'description': {'$regex': '.*' + search_description + '.*', '$options': 'i'}})
 
             products = []
             for product in products_cursor:

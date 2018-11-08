@@ -23,7 +23,7 @@ class Questions(Resource):
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
 
-            questions_cursor = self.mongo.db.questions.find({'product_id': ObjectId(product_id)})
+            questions_cursor = self.mongo.db.questions.find({'product_id': product_id})
 
             questions = []
             for question in questions_cursor:
