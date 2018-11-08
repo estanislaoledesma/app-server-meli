@@ -1,5 +1,5 @@
 # coding: utf-8
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 from flask import request
 from ..settings import errorhandler, responsehandler
 from flask_api import status
@@ -51,6 +51,7 @@ class Deliveries(Resource):
             distance = self.gmaps.distance_matrix([origin_latitude, origin_longitude],
                                                   [destination_latitude, destination_longitude],
                                                   mode = 'driving') ["rows"] [0] ["elements"] [0] ["distance"] ["value"]
+            distance = 10
 
             origin_location = {'lat': origin_latitude, 'lon': origin_longitude}
             destination_location = {'lat': destination_latitude, 'lon': destination_longitude}
@@ -58,8 +59,8 @@ class Deliveries(Resource):
             origin_address = {'street': origin_address_str, 'location': origin_location}
             destination_address = {'street': destination_address_str, 'location': destination_location}
 
-            origin_endpoint = {'location': origin_address, 'timestamp': datetime.datetime.now().timestamp()}
-            destination_endpoint = {'location': destination_address, 'timestamp': datetime.datetime.now().timestamp()}
+            origin_endpoint = {'location': origin_address, 'timestamp': datetime.datetime.now()}
+            destination_endpoint = {'location': destination_address, 'timestamp': datetime.datetime.now()}
 
             delivery = {}
             delivery ['applicationOwner'] = user ['userId']
@@ -98,7 +99,7 @@ class Deliveries(Resource):
                 error = errorhandler.ErrorHandler(status.HTTP_503_SERVICE_UNAVAILABLE, error_message)
                 return error.get_error_response()
 
-            purchase_update = {'delivery_id': str(delivery_id), 'status': purchases.Purchases.PURCHASE_CHECKOUT_DELIVERY}
+            purchase_update = {'delivery_id': str(delivery_id), 'state': purchases.Purchases.PURCHASE_CHECKOUT_DELIVERY}
             self.mongo.db.purchases.update_one({'_id': ObjectId(purchase_id)}, {'$set': purchase_update})
 
             response_data  = response.json()
@@ -127,10 +128,14 @@ class Deliveries(Resource):
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
 
-            json_data = request.get_json(force=True)
-            destination_address_str = json_data ['destination_address']
-            destination_latitude = json_data ['destination_latitude']
-            destination_longitude = json_data['destination_longitude']
+            parser = reqparse.RequestParser()
+            parser.add_argument('destination_address')
+            parser.add_argument('destination_latitude')
+            parser.add_argument('destination_longitude')
+            args = parser.parse_args()
+            destination_address_str = args ['destination_address']
+            destination_latitude = args ['destination_latitude']
+            destination_longitude = args ['destination_longitude']
 
             purchase = self.mongo.db.purchases.find_one({'_id': ObjectId(purchase_id)})
             self.logger.info('purchase : %s', purchase)
@@ -149,6 +154,7 @@ class Deliveries(Resource):
             distance = self.gmaps.distance_matrix([origin_latitude, origin_longitude],
                                                   [destination_latitude, destination_longitude],
                                                   mode = 'driving') ["rows"] [0] ["elements"] [0] ["distance"] ["value"]
+            distance = 0
 
             origin_location = {'lat': origin_latitude, 'lon': origin_longitude}
             destination_location = {'lat': destination_latitude, 'lon': destination_longitude}
@@ -156,8 +162,8 @@ class Deliveries(Resource):
             origin_address = {'street': origin_address_str, 'location': origin_location}
             destination_address = {'street': destination_address_str, 'location': destination_location}
 
-            origin_endpoint = {'location': origin_address, 'timestamp': datetime.datetime.now().timestamp()}
-            destination_endpoint = {'location': destination_address, 'timestamp': datetime.datetime.now().timestamp()}
+            origin_endpoint = {'location': origin_address, 'timestamp': datetime.datetime.now()}
+            destination_endpoint = {'location': destination_address, 'timestamp': datetime.datetime.now()}
 
             delivery = {}
             delivery['id'] = 0

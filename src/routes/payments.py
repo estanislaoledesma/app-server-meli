@@ -51,7 +51,7 @@ class Payments(Resource):
 
             payment = {}
             payment ['currency'] = purchase ['currency']
-            payment ['value'] = purchase ['price']
+            payment ['value'] = purchase ['value']
             payment ['paymentMethod'] = payment_method
 
             payment_id = self.mongo.db.payments.insert_one(payment).inserted_id
@@ -65,7 +65,7 @@ class Payments(Resource):
                 error = errorhandler.ErrorHandler(status.HTTP_503_SERVICE_UNAVAILABLE, error_message)
                 return error.get_error_response()
 
-            purchase_update = {'state': purchases.Purchases.PURCHASE_PAYMENT, 'payment_id': str(payment_id)}
+            purchase_update = {'state': purchases.Purchases.PURCHASE_PENDING_PAYMENT_PROCESS, 'payment_id': str(payment_id)}
             self.mongo.db.purchases.update_one({'_id': ObjectId(purchase_id)}, {'$set': purchase_update})
 
             response_data = {'payment_id': str(payment_id)}
