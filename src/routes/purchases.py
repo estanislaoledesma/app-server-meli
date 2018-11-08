@@ -30,7 +30,7 @@ class Purchases(Resource):
         self.mongo = kwargs.get('mongo')
         self.firebase = kwargs.get('firebase')
 
-    def get(self):
+    def get(self, product_id):
         try:
             # Authentication
             auth_header = request.headers.get('Authorization')
@@ -38,17 +38,18 @@ class Purchases(Resource):
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
 
-            purchases_cursor = self.mongo.db.purchases.find()
+            purchases_cursor = self.mongo.db.purchases.find({"product_id": product_id})
+
+            product = self.mongo.db.products.find_one({'_id': ObjectId(product_id)})
 
             purchases = []
             for purchase in purchases_cursor:
                 self.logger.info(purchase)
                 purchase_to_display = {}
-                product = self.mongo.db.products.find_one({'_id': ObjectId(purchase ['product_id'])})
                 purchase_to_display ['product_name'] = product ['name']
                 purchase_to_display ['units'] = purchase ['units']
                 purchase_to_display ['currency'] = purchase ['currency']
-                purchase_to_display ['value'] = purchase['price']
+                purchase_to_display ['value'] = purchase ['value']
                 purchase_to_display ['state'] = self.PURCHASE_STATES [purchase ['state']]
                 purchase_to_display ['_id'] = str(purchase ['_id'])
                 purchases.append(purchase_to_display)

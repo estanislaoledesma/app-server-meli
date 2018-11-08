@@ -61,7 +61,7 @@ class SignUp(Resource):
             return error.get_error_response()
 
         except Exception as e:
-            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info (prbably email exists)')
+            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Error al conectarse con la base de datos')
             return error.get_error_response()
 
     def get_firebase(self):
@@ -133,6 +133,7 @@ class User(Resource):
             info['password'] = req_user['password']
             info['phone'] = req_user['phone']
             info['uid'] = req_user['uid']
+
             response_data = info
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
@@ -176,19 +177,13 @@ class User(Resource):
             return error.get_error_response()
 
         json_data = request.get_json(force=True)
-        display_name = json_data['display_name']
-        phone = json_data['phone']
 
-        new_data = {}
-        if display_name: 
-            new_data['display_name'] = display_name
-        if phone:
-            new_data['phone'] = phone
         try:
-            print(self.mongo.db.users.update_one({"uid": user_id},{'$set': new_data}))
+            self.mongo.db.users.update_one({"uid": user_id},{'$set': json_data})
 
-            response_data = {'token': user['refreshToken'], 'updated_info': new_data}
+            response_data = json_data
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
+            response.add_autentication_header(user['refreshToken'])
             return response.get_response()
         
         except ValueError as e:
