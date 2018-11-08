@@ -85,7 +85,8 @@ class Questions(Resource):
             question_id = self.mongo.db.questions.insert_one(question).inserted_id
             question ['_id'] = str(question_id)
 
-            response_data = question
+#            response_data = question
+            response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user ['refreshToken'])
             return response.get_response()
