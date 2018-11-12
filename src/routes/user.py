@@ -180,7 +180,7 @@ class User(Resource):
         self.logger.info('edit profile : %s', json_data)
 
         try:
-#            self.mongo.db.users.update_one({"uid": user_id},{'$set': json_data})
+            self.mongo.db.users.update_one({"uid": user_id},{'$set': json_data})
 
             response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
