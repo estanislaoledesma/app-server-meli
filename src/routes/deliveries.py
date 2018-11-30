@@ -12,7 +12,7 @@ TOKEN = 1
 
 class Deliveries(Resource):
 
-    DELIVERIES_URL = "http://localhost:8080/deliveries/estimate"
+    DELIVERIES_URL = "http://localhost:8080/delivery/estimate"
     TRACKING_URL = "http://localhost:8080/tracking"
 
     def __init__(self, **kwargs):
@@ -48,9 +48,9 @@ class Deliveries(Resource):
             origin_address_str = product ['ubication']
             origin_latitude = product ['latitude']
             origin_longitude = product ['longitude']
-            distance = self.gmaps.distance_matrix([origin_latitude, origin_longitude],
+            '''distance = self.gmaps.distance_matrix([origin_latitude, origin_longitude],
                                                   [destination_latitude, destination_longitude],
-                                                  mode = 'driving') ["rows"] [0] ["elements"] [0] ["distance"] ["value"]
+                                                  mode = 'driving') ["rows"] [0] ["elements"] [0] ["distance"] ["value"]'''
             distance = 10
 
             origin_location = {'lat': origin_latitude, 'lon': origin_longitude}
@@ -62,50 +62,41 @@ class Deliveries(Resource):
             origin_endpoint = {'location': origin_address, 'timestamp': datetime.datetime.now()}
             destination_endpoint = {'location': destination_address, 'timestamp': datetime.datetime.now()}
 
-            user_data = self.mongo.db.users.find_one({'_id': ObjectId(user ['userId'])})
+            user_data = self.mongo.db.users.find_one({'uid': user ['userId']})
             self.logger.info('user : %s', product)
 
-            purchase_list = self.mongo.db.purchases.find_one({'user_id': ObjectId(user ['userId'])})
-            self.logger.info('purchase list : %s', purchase_list)
-            purchase_amount = purchase_list.count(True)
+            purchase_amount = self.mongo.db.purchases.find({'user_id': user ['userId']}).count()
+            self.logger.info('purchase amount : %s', purchase_amount)
 
             delivery = {}
-            delivery ['applicationOwner'] = user ['userId']
-            delivery ['start'] = origin_endpoint
-            delivery ['end'] = destination_endpoint
-            delivery ['distance'] = distance
-            delivery ['value'] = purchase ['value']
-            delivery ['route'] = ''
-            delivery ['cost'] = {'currency': product ['currency'], 'value': 0}
-            delivery ['userscore'] = 0
-            delivery ['mail'] = user_data ['email']
-            delivery ['purchaseQuantity'] = purchase_amount
+            delivery ["distance"] = distance
+            delivery ["value"] = purchase ['value']
+            delivery ["userscore"] = 0
+            delivery ["mail"] = user_data ['email']
+            delivery ["purchaseQuantity"] = purchase_amount
+            self.logger.info('request : %s', str(delivery))
 
-            delivery_id = self.mongo.db.deliveries.insert_one(delivery).inserted_id
-
-            delivery ['id'] = str(delivery_id)
-
-            response = requests.post(url = self.DELIVERIES_URL, params = delivery)
+            response = requests.post(url = self.DELIVERIES_URL, data = delivery)
 
             if response.status_code != status.HTTP_200_OK:
-                error_message = response.reason
+                self.logger.info('response : %s', response.content)
+                error_message = response.content
                 error = errorhandler.ErrorHandler(status.HTTP_503_SERVICE_UNAVAILABLE, error_message)
                 return error.get_error_response()
 
-            cost = response.json() ['value']
-            delivery ['cost'] ['value'] = cost
+            cost = response.json() ['cost']
+            delivery ['cost'] = cost
 
-            self.mongo.db.deliveries.update_one({'_id': ObjectId(delivery_id)}, {'$set': delivery})
+            delivery_id = self.mongo.db.deliveries.insert_one(delivery).inserted_id
 
             tracking = {}
             tracking ['id'] = str(delivery_id)
-            tracking ['status'] = ""
-            tracking ['updateAt'] = 0
+            tracking ['status'] = purchases.Purchases.PURCHASE_CHECKOUT_DELIVERY
 
-            response = requests.post(url = self.TRACKING_URL, params = tracking)
+            response = requests.post(url = self.TRACKING_URL, data = tracking)
 
             if response.status_code != status.HTTP_201_CREATED:
-                error_message = response.reason
+                error_message = response.content
                 error = errorhandler.ErrorHandler(status.HTTP_503_SERVICE_UNAVAILABLE, error_message)
                 return error.get_error_response()
 
@@ -130,7 +121,19 @@ class Deliveries(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
             return error.get_error_response()
 
-    def get(self, purchase_id):
+
+class Estimates(Resource):
+
+    DELIVERIES_URL = "http://localhost:8080/delivery/estimate"
+    TRACKING_URL = "http://localhost:8080/tracking"
+
+    def __init__(self, **kwargs):
+        self.logger = kwargs.get('logger')
+        self.mongo = kwargs.get('mongo')
+        self.firebase = kwargs.get('firebase')
+        self.gmaps = kwargs.get('gmaps')
+
+    def get(self, product_id):
         try:
             # Authentication
             auth_header = request.headers.get('Authorization')
@@ -147,23 +150,15 @@ class Deliveries(Resource):
             destination_latitude = args ['destination_latitude']
             destination_longitude = args ['destination_longitude']
 
-            purchase = self.mongo.db.purchases.find_one({'_id': ObjectId(purchase_id)})
-            self.logger.info('purchase : %s', purchase)
-
-            product = self.mongo.db.products.find_one({'_id': ObjectId(purchase ['product_id'])})
+            product = self.mongo.db.products.find_one({'_id': ObjectId(product_id)})
             self.logger.info('product : %s', product)
-
-            purchase_state = purchase ['state']
-            if (purchase_state > purchases.Purchases.PURCHASE_CHECKOUT):
-                error = errorhandler.ErrorHandler(status.HTTP_409_CONFLICT, 'Ya se estableció una entrega.')
-                return error.get_error_response()
 
             origin_address_str = product ['ubication']
             origin_latitude = product ['latitude']
             origin_longitude = product ['longitude']
-            distance = self.gmaps.distance_matrix([origin_latitude, origin_longitude],
+            '''distance = self.gmaps.distance_matrix([origin_latitude, origin_longitude],
                                                   [destination_latitude, destination_longitude],
-                                                  mode = 'driving') ["rows"] [0] ["elements"] [0] ["distance"] ["value"]
+                                                  mode = 'driving') ["rows"] [0] ["elements"] [0] ["distance"] ["value"]'''
             distance = 0
 
             origin_location = {'lat': origin_latitude, 'lon': origin_longitude}
@@ -175,28 +170,22 @@ class Deliveries(Resource):
             origin_endpoint = {'location': origin_address, 'timestamp': datetime.datetime.now()}
             destination_endpoint = {'location': destination_address, 'timestamp': datetime.datetime.now()}
 
-            user_data = self.mongo.db.users.find_one({'_id': ObjectId(user['userId'])})
+            user_data = self.mongo.db.users.find_one({'uid': user ['userId']})
             self.logger.info('user : %s', product)
 
-            purchase_list = self.mongo.db.purchases.find_one({'user_id': ObjectId(user['userId'])})
-            self.logger.info('purchase list : %s', purchase_list)
-            purchase_amount = purchase_list.count(True)
+            purchase_amount = self.mongo.db.purchases.find({'user_id': user ['userId']}).count()
+            self.logger.info('purchase amount : %s', purchase_amount)
 
             delivery = {}
             delivery['id'] = 0
-            delivery ['applicationOwner'] = user ['userId']
-            delivery ['start'] = origin_endpoint
-            delivery ['end'] = destination_endpoint
             delivery ['distance'] = distance
-            delivery ['value'] = distance
-            delivery ['route'] = ''
-            delivery ['cost'] = {'currency': product ['currency'], 'value': 0}
+            delivery ['value'] = product ['price']
             delivery ['userscore'] = 0
             delivery ['mail'] = user_data ['email']
             delivery ['purchaseQuantity'] = purchase_amount
 
 
-            response = requests.post(url = self.DELIVERIES_URL, params = delivery)
+            response = requests.post(url = self.DELIVERIES_URL, data = delivery)
 
             if response.status_code != status.HTTP_200_OK:
                 error_message = response.reason

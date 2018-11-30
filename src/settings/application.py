@@ -53,3 +53,4 @@ api.add_resource(answers.Answers, '/questions/<question_id>/answers', resource_c
 api.add_resource(search.Search, '/products/search', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'gmaps': gmaps})
 api.add_resource(ping.Ping, '/ping', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(rating.Rating, '/score', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
+api.add_resource(deliveries.Estimates, '/products/<product_id>/deliveries/estimate', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'gmaps': gmaps})
