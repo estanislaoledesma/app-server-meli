@@ -45,6 +45,8 @@ class SignUp(Resource):
             user_data['display_name'] = display_name
             user_data['phone'] = phone
             user_data['rating'] = 1
+            user_data["compras"] = []
+            user_data["ventas"] = []
             user_id = str(self.mongo.db.users.insert_one(user_data).inserted_id)
 
             response_data = {'userId': user['localId']}
@@ -135,6 +137,8 @@ class User(Resource):
             info['phone'] = req_user['phone']
             info['uid'] = req_user['uid']
             info['rating'] = req_user['rating']
+            info['compras'] = req_user['compras']
+            info['ventas'] = req_user['ventas']
 
             response_data = info
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)

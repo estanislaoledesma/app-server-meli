@@ -121,6 +121,13 @@ class Purchases(Resource):
             purchase ['value'] = units * product ['price']
 
             purchase_id = self.mongo.db.purchases.insert_one(purchase).inserted_id
+            
+            seller = product['user_id']
+            buyer = user ['userId']
+            
+            self.mongo.db.users.update_one({'uid': seller}, {'$push': {"ventas": purchase_id}})
+            self.mongo.db.users.update_one({'uid': buyer}, {'$push': {"compras": purchase_id}})
+            
 
             response_data = {'purchase_id': str(purchase_id)}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
