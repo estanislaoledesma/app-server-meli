@@ -62,8 +62,7 @@ class Products(Resource):
 
         except pymongo.errors.PyMongoError as e:
             self.logger.info(e)
-            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR,
-                                              'Surgió un problema al acceder a la base de datos')
+            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
             return error.get_error_response()
 
         except Exception as e:
@@ -74,6 +73,7 @@ class Products(Resource):
     def post(self):
         try:
             # Authentication
+
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
             auth = self.firebase.auth()
@@ -83,23 +83,24 @@ class Products(Resource):
             product = json_data['product']
 
             product_to_publish = {}
-            product_to_publish['name'] = product['name']
-            product_to_publish['description'] = product['description']
-            product_to_publish['images'] = self.decoded_images(product['images'], product['name'])
-            product_to_publish['price'] = product['price']
-            product_to_publish['category'] = product['category']
-            product_to_publish['ubication'] = product['ubication']
-            product_to_publish['latitude'] = product['latitude']
-            product_to_publish['longitude'] = product['longitude']
-            product_to_publish['units'] = product['units']
-            product_to_publish['user_id'] = user['userId']
-            product_to_publish['currency'] = self.CURRENCY
+
+            product_to_publish ['name'] = product ['name']
+            product_to_publish ['description'] = product ['description']
+            product_to_publish ['images'] = self.decoded_images(product ['images'], product ['name'])
+            product_to_publish ['price'] = product ['price']
+            product_to_publish ['category'] = product ['category']
+            product_to_publish ['ubication'] = product ['ubication']
+            product_to_publish ['latitude'] = product ['latitude']
+            product_to_publish ['longitude'] = product ['longitude']
+            product_to_publish ['units'] = product ['units']
+            product_to_publish ['user_id'] = user ['userId']
+            product_to_publish ['currency'] = self.CURRENCY
 
             product_id = self.mongo.db.products.insert_one(product_to_publish).inserted_id
-            product_to_publish['_id'] = str(product_id)
+            product_to_publish ['_id'] = str(product_id)
 
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, {})
-            response.add_autentication_header(user['refreshToken'])
+            response.add_autentication_header(user ['refreshToken'])
             return response.get_response()
 
         except IndexError as e:
@@ -116,8 +117,7 @@ class Products(Resource):
             return error.get_error_response()
 
         except pymongo.errors.PyMongoError as e:
-            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR,
-                                              'Surgió un problema al acceder a la base de datos')
+            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
             return error.get_error_response()
 
         except Exception as e:
@@ -131,8 +131,7 @@ class Products(Resource):
             name = product_name + str(i)
             fs_id = self.fs.put(base64.b64decode(image), filename=name)
             images.append(name)
-            i += 1
-
+            i+=1
         return images
 
     def encode_image(self, image_name):

@@ -52,8 +52,14 @@ class Search(Resource):
                 #product_to_display ['thumbnail'] = self.encode_image(product ['images'] [THUMBNAIL])
                 product_to_display ['_id'] = str(product ['_id'])
                 products.append(product_to_display)
+                
+                user_data = self.mongo.db.users.find_one({"uid": user ['userId']})
+                self.logger.info('user data : %s', user_data)
+                product_to_display ['user_name'] = user_data['dispay_name']
+                product_to_display ['user_rating'] = user_data['rating']
+                
 
-            response_data = products
+            response_data = products.sort(key= lambda e: e['user_rating'], reverse=True)
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
             return response.get_response()

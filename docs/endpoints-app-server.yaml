@@ -594,6 +594,41 @@ paths:
           description: "Unexpected error"
           schema:
             $ref: "#/definitions/Error"
+	put:
+      tags:
+        - profile
+      description: |
+        Endpoint para editar el rating/score del usuario.
+      parameters:
+        - description: Datos para modificar el perfil del usuario
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        201:
+          description: "Edición de perfil exitosa"
+          schema:
+            properties:
+              user:
+                $ref: '#/definitions/User'
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "No existe el usuario solicitado"
+          schema:
+            $ref: "#/definitions/Error"
+        409:
+          description: "Conflicto en el update"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
 
 definitions:
   Version:
