@@ -629,6 +629,52 @@ paths:
           description: "Unexpected error"
           schema:
             $ref: "#/definitions/Error"
+  /mypurchases:
+	get:
+      security:
+        - token: []
+      responses:
+        200:
+          description: "Obtención ok"
+          schema:
+            properties:
+              token:
+                $ref: '#/definitions/Token'
+              products:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/PublishedProduct'
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+  /mysales:
+	get:
+      security:
+        - token: []
+      responses:
+        200:
+          description: "Obtención ok"
+          schema:
+            properties:
+              token:
+                $ref: '#/definitions/Token'
+              products:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/PublishedProduct'
+        400:
+          description: "Incumplimiento de precondiciones (parámetros faltantes)"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
 
 definitions:
   Version:
