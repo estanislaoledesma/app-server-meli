@@ -34,7 +34,7 @@ class Product(Resource):
             product_to_display ['name'] = product ['name']
             product_to_display ['description'] = product ['description']
             product_to_display ['price'] = product ['price']
-            product_to_display ['currency'] = product ['currency']
+#            product_to_display ['currency'] = product ['currency']
             product_to_display ['images'] = self.encode_images(product ['images'])
             product_to_display ['category'] = product ['category']
             product_to_display ['units'] = product ['units']
@@ -44,8 +44,8 @@ class Product(Resource):
             self.logger.info('user data : %s', user_data)
             product_to_display ['display_name'] = user_data ['display_name']
             product_to_display ['ubication'] = product ['ubication']
-            product_to_display ['latitude'] = product ['latitude']
-            product_to_display ['longitude'] = product ['longitude']
+#            product_to_display ['latitude'] = product ['latitude']
+#            product_to_display ['longitude'] = product ['longitude']
             product_to_display ['owner_id'] = product ['user_id']
 
             response_data = product_to_display

@@ -183,11 +183,12 @@ class User(Resource):
             return error.get_error_response()
 
         json_data = request.get_json(force=True)
+        self.logger.info('edit profile : %s', json_data)
 
         try:
             self.mongo.db.users.update_one({"uid": user_id},{'$set': json_data})
 
-            response_data = json_data
+            response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
             return response.get_response()

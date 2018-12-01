@@ -11,8 +11,8 @@ from bson import ObjectId
 TOKEN = 1
 THUMBNAIL = 0
 
-class Products(Resource):
 
+class Products(Resource):
     CURRENCY = 'ARS'
 
     def __init__(self, **kwargs):
@@ -24,20 +24,22 @@ class Products(Resource):
 
     def get(self):
         try:
+            # Authentication
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
+
             products_cursor = self.mongo.db.products.find()
-            
+
             products = []
             for product in products_cursor:
                 self.logger.info(product)
                 product_to_display = {}
-                product_to_display ['name'] = product ['name']
-                product_to_display ['price'] = product ['price']
-                #product_to_display ['thumbnail'] = self.encode_image(product ['images'] [THUMBNAIL])
-                product_to_display ['_id'] = str(product ['_id'])
+                product_to_display['name'] = product['name']
+                product_to_display['price'] = product['price']
+                product_to_display ['thumbnail'] = self.encode_image(product ['images'] [THUMBNAIL])
+                product_to_display['_id'] = str(product['_id'])
                 products.append(product_to_display)
 
             response_data = products
@@ -70,7 +72,8 @@ class Products(Resource):
 
     def post(self):
         try:
-			# Authentication
+            # Authentication
+
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
             auth = self.firebase.auth()
@@ -80,6 +83,7 @@ class Products(Resource):
             product = json_data['product']
 
             product_to_publish = {}
+
             product_to_publish ['name'] = product ['name']
             product_to_publish ['description'] = product ['description']
             product_to_publish ['images'] = self.decoded_images(product ['images'], product ['name'])
@@ -128,7 +132,6 @@ class Products(Resource):
             fs_id = self.fs.put(base64.b64decode(image), filename=name)
             images.append(name)
             i+=1
-
         return images
 
     def encode_image(self, image_name):
