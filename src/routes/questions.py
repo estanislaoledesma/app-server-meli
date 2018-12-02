@@ -31,7 +31,7 @@ class Questions(Resource):
                 question_to_display = {}
                 question_to_display ['question'] = question ['question']
 #                question_to_display ['user_id'] = question ['user_id']
-#                question_to_display['_id'] = str(question ['_id'])
+                question_to_display['_id'] = str(question ['_id'])
                 questions.append(question_to_display)
 
             response_data = questions
@@ -85,7 +85,6 @@ class Questions(Resource):
             question_id = self.mongo.db.questions.insert_one(question).inserted_id
             question ['_id'] = str(question_id)
 
-#            response_data = question
             response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user ['refreshToken'])

@@ -130,17 +130,9 @@ class User(Resource):
             req_user = self.mongo.db.users.find_one({"uid": user_id})
             self.logger.info('user : %s', req_user)
 
-            info = {}
-            info['display_name'] = req_user['display_name']
-            info['email'] = req_user['email']
-            info['password'] = req_user['password']
-            info['phone'] = req_user['phone']
-            info['uid'] = req_user['uid']
-            info['rating'] = req_user['rating']
-            info['compras'] = req_user['compras']
-            info['ventas'] = req_user['ventas']
+            req_user ['_id'] = str(req_user ['_id'])
 
-            response_data = info
+            response_data = req_user
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
             return response.get_response()

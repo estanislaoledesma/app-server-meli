@@ -38,7 +38,8 @@ class Products(Resource):
                 product_to_display = {}
                 product_to_display['name'] = product['name']
                 product_to_display['price'] = product['price']
-                product_to_display ['thumbnail'] = self.encode_image(product ['images'] [THUMBNAIL])
+                if (product ['images']):
+                    product_to_display ['thumbnail'] = self.encode_image(product ['images'] [THUMBNAIL])
                 product_to_display['_id'] = str(product['_id'])
                 products.append(product_to_display)
 
@@ -47,13 +48,6 @@ class Products(Resource):
             response.add_autentication_header(user['refreshToken'])
             return response.get_response()
 
-        except IndexError as e:
-            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
-            return error.get_error_response()
-
-        except AttributeError as e:
-            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
-            return error.get_error_response()
 
         except pyrebase.pyrebase.HTTPError as e:
             error_message = errorhandler.get_error_message(e)

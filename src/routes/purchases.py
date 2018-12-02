@@ -58,7 +58,6 @@ class Purchases(Resource):
                 purchase_to_display ['units'] = purchase ['units']
                 purchase_to_display ['currency'] = purchase ['currency']
                 purchase_to_display ['value'] = purchase ['value']
-                purchase_to_display ['state'] = self.PURCHASE_STATES [purchase ['state']]
                 purchase_to_display ['_id'] = str(purchase ['_id'])
                 purchases.append(purchase_to_display)
 
@@ -116,7 +115,6 @@ class Purchases(Resource):
             purchase ['product_id'] = str(product ['_id'])
             purchase ['user_id'] = user ['userId']
             purchase ['units'] = units
-            purchase ['state'] = self.PURCHASE_CHECKOUT
             purchase ['currency'] = product ['currency']
             purchase ['value'] = units * product ['price']
 
@@ -125,8 +123,8 @@ class Purchases(Resource):
             seller = product['user_id']
             buyer = user ['userId']
             
-            self.mongo.db.users.update_one({'uid': seller}, {'$push': {"ventas": purchase_id}})
-            self.mongo.db.users.update_one({'uid': buyer}, {'$push': {"compras": purchase_id}})
+            self.mongo.db.users.update_one({'uid': seller}, {'$push': {"ventas": str(purchase_id)}})
+            self.mongo.db.users.update_one({'uid': buyer}, {'$push': {"compras": str(purchase_id)}})
             
 
             response_data = {'purchase_id': str(purchase_id)}

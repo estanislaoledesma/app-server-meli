@@ -12,6 +12,14 @@ TOKEN = 1
 
 class Deliveries(Resource):
 
+    PENDING_DELIVERY = 5
+    DELIVERY_IN_PROGRESS = 6
+    DELIVERED = 7
+
+    DELIVERY_STATUS = {PENDING_DELIVERY: 'Entrega Pendiente',
+                       DELIVERY_IN_PROGRESS: 'Entrega en proceso',
+                       DELIVERED: 'Entrega Realizada'}
+
     DELIVERIES_URL = "http://localhost:8080/delivery/estimate"
     TRACKING_URL = "http://localhost:8080/tracking"
 
@@ -39,11 +47,6 @@ class Deliveries(Resource):
 
             product = self.mongo.db.products.find_one({'_id': ObjectId(purchase ['product_id'])})
             self.logger.info('product : %s', product)
-
-            purchase_state = purchase ['state']
-            if (purchase_state > purchases.Purchases.PURCHASE_CHECKOUT):
-                error = errorhandler.ErrorHandler(status.HTTP_409_CONFLICT, 'Ya se estableció una entrega.')
-                return error.get_error_response()
 
             origin_address_str = product ['ubication']
             origin_latitude = product ['latitude']
@@ -91,7 +94,7 @@ class Deliveries(Resource):
 
             tracking = {}
             tracking ['id'] = str(delivery_id)
-            tracking ['status'] = purchases.Purchases.PURCHASE_CHECKOUT_DELIVERY
+            tracking ['status'] = Deliveries.DELIVERY_STATUS [Deliveries.PENDING_DELIVERY]
 
             response = requests.post(url = self.TRACKING_URL, data = tracking)
 
@@ -100,10 +103,45 @@ class Deliveries(Resource):
                 error = errorhandler.ErrorHandler(status.HTTP_503_SERVICE_UNAVAILABLE, error_message)
                 return error.get_error_response()
 
-            purchase_update = {'delivery_id': str(delivery_id), 'state': purchases.Purchases.PURCHASE_CHECKOUT_DELIVERY}
+            purchase_update = {'delivery_id': str(delivery_id)}
             self.mongo.db.purchases.update_one({'_id': ObjectId(purchase_id)}, {'$set': purchase_update})
 
             response_data  = response.json()
+            response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
+            response.add_autentication_header(user['refreshToken'])
+            return response.get_response()
+
+        except IndexError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
+            return error.get_error_response()
+
+        except pyrebase.pyrebase.HTTPError as e:
+            error_message = errorhandler.get_error_message(e)
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
+            return error.get_error_response()
+
+        except pymongo.errors.PyMongoError as e:
+            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
+            return error.get_error_response()
+
+
+    def get(self, purchase_id):
+        try:
+            # Authentication
+            auth_header = request.headers.get('Authorization')
+            auth_token = auth_header.split(" ")[TOKEN]
+            auth = self.firebase.auth()
+            user = auth.refresh(auth_token)
+
+            purchase = self.mongo.db.purchases.find_one({'_id': ObjectId(purchase_id)})
+            self.logger.info('purchase : %s', purchase)
+
+            delivery = self.mongo.db.deliveries.find_one({'_id': ObjectId(purchase ['delivery_id'])})
+            self.logger.info('delivery : %s', delivery)
+
+            delivery ['_id'] = str(delivery ['_id'])
+
+            response_data  = delivery
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
             return response.get_response()
@@ -188,7 +226,7 @@ class Estimates(Resource):
             response = requests.post(url = self.DELIVERIES_URL, data = delivery)
 
             if response.status_code != status.HTTP_200_OK:
-                error_message = response.reason
+                error_message = response.content
                 error = errorhandler.ErrorHandler(status.HTTP_503_SERVICE_UNAVAILABLE, error_message)
                 return error.get_error_response()
 
