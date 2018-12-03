@@ -7,7 +7,7 @@ from flask_marshmallow import Marshmallow
 from flask_pymongo import PyMongo
 from src.routes import hello, user, products, product, \
     purchases, payments, deliveries, trackings, questions, answers, \
-    search, ping, rating, activity
+    search, ping, rating, activity, statistics
 from .config import Config
 import logging
 import pyrebase
@@ -58,3 +58,4 @@ api.add_resource(activity.MyPurchases, '/mypurchases', resource_class_kwargs={'l
 api.add_resource(activity.MySales, '/mysales', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(deliveries.DeliveryStatus, '/deliveries/<tracking_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(payments.PaymentStatus, '/payments/<payment_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
+api.add_resource(statistics.Statistics, '/stats', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})

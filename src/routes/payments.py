@@ -158,8 +158,4 @@ class PaymentStatus(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
             return error.get_error_response()
 
-        except pyrebase.pyrebase.HTTPError as e:
-            error_message = errorhandler.get_error_message(e)
-            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
-            return error.get_error_response()
 
