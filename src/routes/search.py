@@ -8,12 +8,15 @@ import base64
 from gridfs import GridFS
 from bson import ObjectId
 from flask_restful import reqparse
+from .deliveries import getDistance
 
 TOKEN = 1
 THUMBNAIL = 0
 
 
 class Search(Resource):
+
+    DISTANCE_RATIO = 5
 
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
@@ -39,8 +42,11 @@ class Search(Resource):
             search_description = args ['description']
             search_latitude = args ['latitude']
             search_longitude = args['longitude']
+            destination = [search_latitude, search_longitude]
+            self.logger.info("destination: %s", str(destination))
 
             products_cursor = self.mongo.db.products.find({'name': {'$regex': '.*' + search_name + '.*', '$options': 'i'}, 'description': {'$regex': '.*' + search_description + '.*', '$options': 'i'}})
+            self.logger.info(str(products_cursor))
 
             products = []
             for product in products_cursor:
@@ -49,17 +55,22 @@ class Search(Resource):
                 product_to_display = {}
                 product_to_display ['name'] = product ['name']
                 product_to_display ['price'] = product ['price']
-                #product_to_display ['thumbnail'] = self.encode_image(product ['images'] [THUMBNAIL])
+                if (product ['images']):
+                    product_to_display ['thumbnail'] = self.encode_image(product ['images'] [THUMBNAIL])
                 product_to_display ['_id'] = str(product ['_id'])
-                products.append(product_to_display)
-                
+
                 user_data = self.mongo.db.users.find_one({"uid": user ['userId']})
                 self.logger.info('user data : %s', user_data)
-                product_to_display ['user_name'] = user_data['dispay_name']
+                product_to_display ['user_name'] = user_data['display_name']
                 product_to_display ['user_rating'] = user_data['rating']
-                
 
-            response_data = products.sort(key= lambda e: e['user_rating'], reverse=True)
+                productLocation = [product ['latitude'], product ['longitude']]
+                if (destination [0] and getDistance(productLocation, destination) > Search.DISTANCE_RATIO):
+                    continue
+                products.append(product_to_display)
+
+            #response_data = products.sort(key= lambda e: e['user_rating'], reverse=True)
+            response_data = products
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
             return response.get_response()
@@ -82,10 +93,6 @@ class Search(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema al acceder a la base de datos')
             return error.get_error_response()
 
-        except Exception as e:
-            self.logger.info(e)
-            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Surgió un problema inesperado')
-            return error.get_error_response()
 
     def decoded_images(self, encoded_images, product_name):
         images = []

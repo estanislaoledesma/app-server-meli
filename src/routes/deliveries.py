@@ -85,7 +85,7 @@ class Deliveries(Resource):
             delivery ["purchaseQuantity"] = purchase_amount
             self.logger.info('request : %s', str(delivery))
 
-            response = requests.post(url = self.DELIVERIES_URL, data = delivery)
+            response = requests.post(url = self.DELIVERIES_URL, json = delivery)
 
             if response.status_code != status.HTTP_200_OK:
                 self.logger.info('response : %s', response.content)
@@ -102,7 +102,7 @@ class Deliveries(Resource):
             tracking ['id'] = str(delivery_id)
             tracking ['status'] = Deliveries.DELIVERY_STATUS [Deliveries.PENDING_DELIVERY]
 
-            response = requests.post(url = self.TRACKING_URL, data = tracking)
+            response = requests.post(url = self.TRACKING_URL, json = tracking)
 
             if response.status_code != status.HTTP_201_CREATED:
                 error_message = response.content
@@ -230,7 +230,7 @@ class Estimates(Resource):
             delivery ['purchaseQuantity'] = purchase_amount
 
 
-            response = requests.post(url = self.DELIVERIES_URL, data = delivery)
+            response = requests.post(url = self.DELIVERIES_URL, json = delivery)
 
             if response.status_code != status.HTTP_200_OK:
                 error_message = response.content
