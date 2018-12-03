@@ -15,7 +15,7 @@ class Rating(Resource):
         self.firebase = kwargs.get('firebase')
         self.mongo = kwargs.get('mongo')
         
-    def put(self):
+    def put(self, user_id):
         try:
             auth_header = request.headers.get('Authorization')
             if not auth_header:
@@ -34,15 +34,13 @@ class Rating(Resource):
             return error.get_error_response()
 
         json_data = request.get_json(force=True)
-        
-        user_rated = json_data['user_id']
+
         calification = json_data['rating']
-        
 
         try:
-            self.mongo.db.users.update_one({"uid": user_rated}, {'$inc': {"rating": calification}})
-                                                                 
-            response_data = json_data
+            self.mongo.db.users.update_one({"uid": user_id}, {'$inc': {"rating": calification}})
+
+            response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
             return response.get_response()
