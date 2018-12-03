@@ -42,6 +42,7 @@ class Search(Resource):
             parser.add_argument('longitude')
             parser.add_argument('lowest_price')
             parser.add_argument('greatest_price')
+            parser.add_argument('category')
             args = parser.parse_args()
             search_name = args ['name']
             search_description = args ['description']
@@ -58,10 +59,13 @@ class Search(Resource):
             except ValueError as e:
                 self.logger.info("No price range search")
 
+            search_category = args ['category']
+
 
             products_cursor = self.mongo.db.products.find({'name': {'$regex': '.*' + search_name + '.*', '$options': 'i'},
                                                            'description': {'$regex': '.*' + search_description + '.*', '$options': 'i'},
-                                                           'price': {'$gte': search_lowest_price, '$lte': search_greatest_price}})
+                                                           'price': {'$gte': search_lowest_price, '$lte': search_greatest_price},
+                                                           'category': {'$regex': '.*' + search_category + '.*', '$options': 'i'}})
 
             products = []
             for product in products_cursor:
