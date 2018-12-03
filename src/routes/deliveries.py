@@ -265,7 +265,7 @@ class DeliveryStatus(Resource):
         self.firebase = kwargs.get('firebase')
         self.gmaps = kwargs.get('gmaps')
 
-    def put(self, delivery_id):
+    def put(self, tracking_id):
         try:
             auth_header = request.headers.get('Authorization')
             if not auth_header:
@@ -288,7 +288,7 @@ class DeliveryStatus(Resource):
             self.logger.info('edit delivery: %s', json_data)
             new_status = json_data ['status']
 
-            self.mongo.db.deliveries.update_one({"_id": ObjectId(delivery_id)}, {'$set': {'status': new_status}})
+            self.mongo.db.deliveries.update_one({"tracking_id": tracking_id}, {'$set': {'status': new_status}})
 
             response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)

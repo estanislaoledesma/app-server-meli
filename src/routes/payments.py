@@ -156,8 +156,16 @@ class PaymentStatus(Resource):
             json_data = request.get_json(force=True)
             self.logger.info('edit payment: %s', json_data)
             new_status = json_data ['status']
+            tracking_id = json_data ['tracking_id']
 
             self.mongo.db.payments.update_one({"_id": ObjectId(payment_id)}, {'$set': {'status': new_status}})
+
+            purchase = self.mongo.db.purchases.find_one({'payment_id': payment_id})
+            self.logger.info('purchase : %s', purchase)
+
+            delivery_id = purchase ['delivery_id']
+
+            self.mongo.db.deliveries.update_one({"_id": ObjectId(delivery_id)}, {'$set': {'tracking_id': tracking_id}})
 
             response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
@@ -172,3 +180,4 @@ class PaymentStatus(Resource):
             error_message = errorhandler.get_error_message(e)
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
             return error.get_error_response()
+
