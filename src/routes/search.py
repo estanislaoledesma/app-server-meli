@@ -69,7 +69,7 @@ class Search(Resource):
                     continue
                 products.append(product_to_display)
 
-            #response_data = products.sort(key= lambda e: e['user_rating'], reverse=True)
+            products.sort(key = lambda product: product ['user_rating'], reverse=True)
             response_data = products
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
