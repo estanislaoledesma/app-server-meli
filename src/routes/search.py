@@ -9,6 +9,7 @@ from gridfs import GridFS
 from bson import ObjectId
 from flask_restful import reqparse
 from .deliveries import getDistance
+import sys
 
 TOKEN = 1
 THUMBNAIL = 0
@@ -17,6 +18,8 @@ THUMBNAIL = 0
 class Search(Resource):
 
     DISTANCE_RATIO = 5
+    MIN_PRICE = 0
+    MAX_PRICE = sys.maxsize
 
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
@@ -37,6 +40,8 @@ class Search(Resource):
             parser.add_argument('description')
             parser.add_argument('latitude')
             parser.add_argument('longitude')
+            parser.add_argument('lowest_price')
+            parser.add_argument('greatest_price')
             args = parser.parse_args()
             search_name = args ['name']
             search_description = args ['description']
@@ -44,9 +49,19 @@ class Search(Resource):
             search_longitude = args['longitude']
             destination = [search_latitude, search_longitude]
             self.logger.info("destination: %s", str(destination))
+            search_lowest_price = Search.MIN_PRICE
+            search_greatest_price = Search.MAX_PRICE
 
-            products_cursor = self.mongo.db.products.find({'name': {'$regex': '.*' + search_name + '.*', '$options': 'i'}, 'description': {'$regex': '.*' + search_description + '.*', '$options': 'i'}})
-            self.logger.info(str(products_cursor))
+            try:
+                search_lowest_price = int(args['lowest_price'])
+                search_greatest_price = int(args['greatest_price'])
+            except ValueError as e:
+                self.logger.info("No price range search")
+
+
+            products_cursor = self.mongo.db.products.find({'name': {'$regex': '.*' + search_name + '.*', '$options': 'i'},
+                                                           'description': {'$regex': '.*' + search_description + '.*', '$options': 'i'},
+                                                           'price': {'$gte': search_lowest_price, '$lte': search_greatest_price}})
 
             products = []
             for product in products_cursor:
