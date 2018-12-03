@@ -57,3 +57,4 @@ api.add_resource(deliveries.Estimates, '/products/<product_id>/deliveries/estima
 api.add_resource(activity.MyPurchases, '/mypurchases', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(activity.MySales, '/mysales', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(deliveries.DeliveryStatus, '/deliveries/<delivery_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
+api.add_resource(payments.PaymentStatus, '/payments/<payment_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
