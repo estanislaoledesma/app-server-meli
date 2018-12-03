@@ -64,7 +64,7 @@ class Payments(Resource):
             payment.pop('_id', None)
             self.logger.info('payment : %s', payment)
 
-            response = requests.post(url = self.PAYEMENTS_URL, data = payment)
+            response = requests.post(url = self.PAYEMENTS_URL, json = payment)
 
             if response.status_code != status.HTTP_201_CREATED:
                 error_message = response.content

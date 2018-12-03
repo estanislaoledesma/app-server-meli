@@ -7,8 +7,13 @@ import pyrebase, pymongo, requests
 from bson.objectid import ObjectId
 from . import purchases
 import datetime
+import geopy.distance
 
 TOKEN = 1
+
+def getDistance(origin, destination):
+    distance = geopy.distance.distance(origin, destination).km
+    return distance
 
 class Deliveries(Resource):
 
@@ -41,6 +46,7 @@ class Deliveries(Resource):
             destination_address_str = json_data ['destination_address']
             destination_latitude = json_data ['destination_latitude']
             destination_longitude = json_data['destination_longitude']
+            destination = [destination_latitude, destination_longitude]
 
             purchase = self.mongo.db.purchases.find_one({'_id': ObjectId(purchase_id)})
             self.logger.info('purchase : %s', purchase)
@@ -51,10 +57,10 @@ class Deliveries(Resource):
             origin_address_str = product ['ubication']
             origin_latitude = product ['latitude']
             origin_longitude = product ['longitude']
-            '''distance = self.gmaps.distance_matrix([origin_latitude, origin_longitude],
-                                                  [destination_latitude, destination_longitude],
-                                                  mode = 'driving') ["rows"] [0] ["elements"] [0] ["distance"] ["value"]'''
-            distance = 10
+            origin = [origin_latitude, origin_longitude]
+
+            distance = getDistance(origin, destination)
+            self.logger.info('distance : %s', distance)
 
             origin_location = {'lat': origin_latitude, 'lon': origin_longitude}
             destination_location = {'lat': destination_latitude, 'lon': destination_longitude}
@@ -187,6 +193,7 @@ class Estimates(Resource):
             destination_address_str = args ['destination_address']
             destination_latitude = args ['destination_latitude']
             destination_longitude = args ['destination_longitude']
+            destination = [destination_latitude, destination_longitude]
 
             product = self.mongo.db.products.find_one({'_id': ObjectId(product_id)})
             self.logger.info('product : %s', product)
@@ -194,10 +201,10 @@ class Estimates(Resource):
             origin_address_str = product ['ubication']
             origin_latitude = product ['latitude']
             origin_longitude = product ['longitude']
-            '''distance = self.gmaps.distance_matrix([origin_latitude, origin_longitude],
-                                                  [destination_latitude, destination_longitude],
-                                                  mode = 'driving') ["rows"] [0] ["elements"] [0] ["distance"] ["value"]'''
-            distance = 0
+            origin = [origin_latitude, origin_longitude]
+
+            distance = getDistance(origin, destination)
+            self.logger.info('distance : %s', distance)
 
             origin_location = {'lat': origin_latitude, 'lon': origin_longitude}
             destination_location = {'lat': destination_latitude, 'lon': destination_longitude}
