@@ -23,30 +23,22 @@ class MyPurchases(Resource):
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
 
-            req_user = self.mongo.db.users.find_one({"uid": user ['userId']})
-            self.logger.info('user : %s', req_user)
-
-            compras = req_user['compras']
+            purchases_cursor = self.mongo.db.purchases.find({"user_id": user['userId']})
+            self.logger.info('user : %s', purchases_cursor)
             
-            compras_show = []
-            
-            for purchase_id in compras:
-                purchase= self.mongo.db.purchases.find_one({"_id": ObjectId(purchase_id)})
-                product = self.mongo.db.products.find_one({'_id': ObjectId(purchase ['product_id'])})
-                seller = self.mongo.db.users.find_one({'uid': product['user_id']})
-                
+            purchases = []
+            for purchase in purchases_cursor:
+                product = self.mongo.db.products.find_one({"_id": ObjectId(purchase['product_id'])})
                 self.logger.info(purchase)
                 purchase_to_display = {}
-                purchase_to_display['product_name'] = product ['name']
-                purchase_to_display['units'] = purchase ['units']
-                purchase_to_display['currency'] = purchase ['currency']
-                purchase_to_display['value'] = purchase ['value']
-                purchase_to_display['state'] = purchase ['state']
-                purchase_to_display['username'] = seller['display_name']
-                compras_show.append(purchase_to_display)
-
+                purchase_to_display['product_name'] = product['name']
+                purchase_to_display['units'] = purchase['units']
+                purchase_to_display['currency'] = purchase['currency']
+                purchase_to_display['value'] = purchase['value']
+                purchase_to_display['_id'] = str(purchase['_id'])
+                purchases.append(purchase_to_display)
             
-            response_data = compras_show
+            response_data = purchases
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
             return response.get_response()
@@ -83,30 +75,24 @@ class MySales(Resource):
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
 
-            req_user = self.mongo.db.users.find_one({"uid": user ['userId']})
-            self.logger.info('user : %s', req_user)
+            products_cursor = self.mongo.db.products.find({"user_id": user['userId']})
+            self.logger.info('user : %s', products_cursor)
 
-            sales = req_user['ventas']
-            
-            sales_show = []
-            
-            for purchase_id in sales:
-                purchase= self.mongo.db.purchases.find_one({"_id": ObjectId(purchase_id)})
-                product = self.mongo.db.products.find_one({'_id': ObjectId(purchase ['product_id'])})
-                buyer = self.mongo.db.users.find_one({'uid': purchase ['user_id']})
-                
-                self.logger.info(purchase)
-                purchase_to_display = {}
-                purchase_to_display['product_name'] = product ['name']
-                purchase_to_display['units'] = purchase ['units']
-                purchase_to_display['currency'] = purchase ['currency']
-                purchase_to_display['value'] = purchase ['value']
-                purchase_to_display['state'] = purchase ['state']
-                purchase_to_display['username'] = buyer['display_name']
-                sales_show.append(purchase_to_display)
+            sales = []
+            for product in products_cursor:
+                purchases_cursor = self.mongo.db.purchases.find({"product_id": str(product['_id'])})
+                self.logger.info(purchases_cursor)
 
-            
-            response_data = sales_show
+                for purchase in purchases_cursor:
+                    purchase_to_display = {}
+                    purchase_to_display['product_name'] = product['name']
+                    purchase_to_display['units'] = purchase['units']
+                    purchase_to_display['currency'] = purchase['currency']
+                    purchase_to_display['value'] = purchase['value']
+                    purchase_to_display['_id'] = str(purchase['_id'])
+                    sales.append(purchase_to_display)
+
+            response_data = sales
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
             return response.get_response()
