@@ -267,23 +267,6 @@ class DeliveryStatus(Resource):
 
     def put(self, tracking_id):
         try:
-            auth_header = request.headers.get('Authorization')
-            if not auth_header:
-                raise IndexError
-
-            auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
-            user = auth.refresh(auth_token)
-
-        except IndexError as e:
-            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
-            return error.get_error_response()
-
-        except AttributeError as e:
-            error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
-            return error.get_error_response()
-
-        try:
             json_data = request.get_json(force=True)
             self.logger.info('edit delivery: %s', json_data)
             new_status = json_data ['status']
@@ -292,7 +275,6 @@ class DeliveryStatus(Resource):
 
             response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
-            response.add_autentication_header(user['refreshToken'])
             return response.get_response()
 
         except ValueError as e:
