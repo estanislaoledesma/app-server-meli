@@ -15,15 +15,26 @@ class Questions(Resource):
         self.mongo = kwargs.get('mongo')
         self.firebase = kwargs.get('firebase')
 
+    def get_firebase(self):
+        return self.firebase
+
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
+
     def get(self, product_id):
         try:
             # Authentication
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
-            questions_cursor = self.mongo.db.questions.find({'product_id': product_id})
+            mongo = self.get_mongo()
+            questions_cursor = mongo.db.questions.find({'product_id': product_id})
 
             questions = []
             for question in questions_cursor:
@@ -68,10 +79,12 @@ class Questions(Resource):
             # Authentication
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
-            product = self.mongo.db.products.find_one({'_id': ObjectId(product_id)})
+            mongo = self.get_mongo()
+            product = mongo.db.products.find_one({'_id': ObjectId(product_id)})
             self.logger.info('product : %s', product)
 
             json_data = request.get_json(force=True)
@@ -82,7 +95,7 @@ class Questions(Resource):
             question ['user_id'] = user ['userId']
             question ['question'] = question_str
 
-            question_id = self.mongo.db.questions.insert_one(question).inserted_id
+            question_id = mongo.db.questions.insert_one(question).inserted_id
             question ['_id'] = str(question_id)
 
             response_data = {}

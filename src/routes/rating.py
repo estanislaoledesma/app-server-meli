@@ -14,6 +14,15 @@ class Rating(Resource):
         self.logger = kwargs.get('logger')
         self.firebase = kwargs.get('firebase')
         self.mongo = kwargs.get('mongo')
+
+    def get_firebase(self):
+        return self.firebase
+
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
         
     def put(self, user_id):
         try:
@@ -22,7 +31,8 @@ class Rating(Resource):
                 raise IndexError
 
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
         except IndexError as e:
@@ -38,7 +48,8 @@ class Rating(Resource):
         calification = json_data['rating']
 
         try:
-            self.mongo.db.users.update_one({"uid": user_id}, {'$inc': {"rating": calification}})
+            mongo = self.get_mongo()
+            mongo.db.users.update_one({"uid": user_id}, {'$inc': {"rating": calification}})
 
             response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)

@@ -38,17 +38,28 @@ class Purchases(Resource):
         self.mongo = kwargs.get('mongo')
         self.firebase = kwargs.get('firebase')
 
+    def get_firebase(self):
+        return self.firebase
+
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
+
     def get(self, product_id):
         try:
             # Authentication
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
-            purchases_cursor = self.mongo.db.purchases.find({"product_id": product_id})
+            mongo = self.get_mongo()
+            purchases_cursor = mongo.db.purchases.find({"product_id": product_id})
 
-            product = self.mongo.db.products.find_one({'_id': ObjectId(product_id)})
+            product = mongo.db.products.find_one({'_id': ObjectId(product_id)})
 
             purchases = []
             for purchase in purchases_cursor:
@@ -94,13 +105,15 @@ class Purchases(Resource):
             # Authentication
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
             json_data = request.get_json(force=True)
             units = json_data['units']
 
-            product = self.mongo.db.products.find_one({'_id': ObjectId(product_id)})
+            mongo = self.get_mongo()
+            product = mongo.db.products.find_one({'_id': ObjectId(product_id)})
             self.logger.info('product : %s', product)
 
             available_units = product ['units']
@@ -109,7 +122,7 @@ class Purchases(Resource):
                 return error.get_error_response()
 
             product_availability = {'units': (available_units - units)}
-            self.mongo.db.products.update_one({'_id': ObjectId(product_id)}, {'$set': product_availability})
+            mongo.db.products.update_one({'_id': ObjectId(product_id)}, {'$set': product_availability})
 
             purchase = {}
             purchase ['product_id'] = str(product ['_id'])
@@ -118,13 +131,13 @@ class Purchases(Resource):
             purchase ['currency'] = product ['currency']
             purchase ['value'] = units * product ['price']
 
-            purchase_id = self.mongo.db.purchases.insert_one(purchase).inserted_id
+            purchase_id = mongo.db.purchases.insert_one(purchase).inserted_id
             
             seller = product['user_id']
             buyer = user ['userId']
             
-            self.mongo.db.users.update_one({'uid': seller}, {'$push': {"ventas": str(purchase_id)}})
-            self.mongo.db.users.update_one({'uid': buyer}, {'$push': {"compras": str(purchase_id)}})
+            mongo.db.users.update_one({'uid': seller}, {'$push': {"ventas": str(purchase_id)}})
+            mongo.db.users.update_one({'uid': buyer}, {'$push': {"compras": str(purchase_id)}})
             
 
             response_data = {'purchase_id': str(purchase_id)}

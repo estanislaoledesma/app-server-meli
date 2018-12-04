@@ -38,6 +38,7 @@ class SignUp(Resource):
         auth = firebase.auth()
         try:
             user = auth.create_user_with_email_and_password(email, password)
+            self.logger.info('user: %s', user)
 
             user_data = {}
             user_data['uid'] = user['localId']
@@ -49,7 +50,9 @@ class SignUp(Resource):
             user_data["compras"] = []
             user_data["ventas"] = []
             user_data["registration_id"] = registration_id
-            user_id = str(self.mongo.db.users.insert_one(user_data).inserted_id)
+
+            mongo = self.get_mongo()
+            user_id = str(mongo.db.users.insert_one(user_data).inserted_id)
 
             response_data = {'userId': user['localId']}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
@@ -62,6 +65,7 @@ class SignUp(Resource):
 
         except pyrebase.pyrebase.HTTPError as e:
             error_message = errorhandler.get_error_message(e)
+            self.logger.info(error_message)
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, e)
             return error.get_error_response()
 
@@ -71,6 +75,12 @@ class SignUp(Resource):
 
     def get_firebase(self):
         return self.firebase
+
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
 
 
 class Login(Resource):
@@ -91,7 +101,9 @@ class Login(Resource):
             user = auth.sign_in_with_email_and_password(email, password)
             self.logger.info('user : %s', user)
 
-            self.mongo.db.users.update_one({"uid": user ['localId']}, {'$set': {'registration_id': registration_id}})
+            mongo = self.get_mongo()
+
+            mongo.db.users.update_one({"uid": user ['localId']}, {'$set': {'registration_id': registration_id}})
 
             response_data = {'userId': user['localId']}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
@@ -114,6 +126,12 @@ class Login(Resource):
     def get_firebase(self):
         return self.firebase
 
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
+
 class User(Resource):
 
     def __init__(self, **kwargs):
@@ -124,16 +142,25 @@ class User(Resource):
     def get_firebase(self):
         return self.firebase
 
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
+
     def get(self, user_id):
         try:
             auth_header = request.headers.get('Authorization')
             if not auth_header:
                 raise IndexError
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
-            req_user = self.mongo.db.users.find_one({"uid": user_id})
+            mongo = self.get_mongo()
+
+            req_user = mongo.db.users.find_one({"uid": user_id})
             self.logger.info('user : %s', req_user)
 
             req_user ['_id'] = str(req_user ['_id'])
@@ -169,7 +196,8 @@ class User(Resource):
                 raise IndexError
 
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
         except IndexError as e:
@@ -180,11 +208,17 @@ class User(Resource):
             error = errorhandler.ErrorHandler(status.HTTP_401_UNAUTHORIZED, 'Debe autenticarse previamente.')
             return error.get_error_response()
 
+        except pyrebase.pyrebase.HTTPError as e:
+            error_message = errorhandler.get_error_message(e)
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, error_message)
+            return error.get_error_response()
+
         json_data = request.get_json(force=True)
         self.logger.info('edit profile : %s', json_data)
 
         try:
-            self.mongo.db.users.update_one({"uid": user_id},{'$set': json_data})
+            mongo = self.get_mongo()
+            mongo.db.users.update_one({"uid": user_id},{'$set': json_data})
 
             response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
