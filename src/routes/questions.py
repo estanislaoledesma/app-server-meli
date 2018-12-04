@@ -29,9 +29,12 @@ class Questions(Resource):
             for question in questions_cursor:
                 self.logger.info(question)
                 question_to_display = {}
-                question_to_display ['question'] = question ['question']
+                question_to_display['question'] = question ['question']
 #                question_to_display ['user_id'] = question ['user_id']
+                if 'answer' in question:
+                    question_to_display['answer'] = question['answer']
                 question_to_display['_id'] = str(question ['_id'])
+
                 questions.append(question_to_display)
 
             response_data = questions

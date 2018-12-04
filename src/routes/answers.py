@@ -71,23 +71,26 @@ class Answers(Resource):
             auth = self.firebase.auth()
             user = auth.refresh(auth_token)
 
-            question = self.mongo.db.questions.find_one({'_id': ObjectId(question_id)})
-            self.logger.info('question : %s', question)
+#            question = self.mongo.db.questions.find_one({'_id': ObjectId(question_id)})
+#            self.logger.info('question : %s', question)
 
             json_data = request.get_json(force=True)
-            answer_str = json_data ['answer']
+            answer_str = json_data['answer']
 
-            answer = {}
-            answer ['question_id'] = str(question_id)
-            answer ['user_id'] = user ['userId']
-            answer ['answer'] = answer_str
+            self.mongo.db.questions.update({'_id': ObjectId(question_id)}, {'$set': {'answer': answer_str}})
 
-            answer_id = self.mongo.db.answers.insert_one(answer).inserted_id
-            answer ['_id'] = str(answer_id)
+#            answer = {}
+#            answer ['question_id'] = str(question_id)
+#            answer ['user_id'] = user ['userId']
+#            answer ['answer'] = answer_str
 
-            response_data = answer
+#            answer_id = self.mongo.db.answers.insert_one(answer).inserted_id
+#            answer ['_id'] = str(answer_id)
+
+#            response_data = answer
+            response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
-            response.add_autentication_header(user ['refreshToken'])
+            response.add_autentication_header(user['refreshToken'])
             return response.get_response()
 
         except IndexError as e:
