@@ -2,6 +2,7 @@
 from flask_restful import Resource, reqparse
 from flask import request
 from ..settings import errorhandler, responsehandler
+from ..models import push
 from flask_api import status
 import pyrebase, pymongo, requests
 from bson.objectid import ObjectId
@@ -256,6 +257,19 @@ class DeliveryStatus(Resource):
             new_status = json_data ['status']
 
             self.mongo.db.deliveries.update_one({"tracking_id": tracking_id}, {'$set': {'status': new_status}})
+
+            delivery = self.mongo.db.deliveries.find_one({'tracking_id': tracking_id})
+            delivery_id = str(delivery ['_id'])
+
+            purchase = self.mongo.db.purchases.find_one({'delivery_id': delivery_id})
+            user_id = str(purchase['user_id'])
+
+            user = self.mongo.db.users.find_one({'uid': user_id})
+            self.logger.info('user : %s', user)
+            registration_id = user ['registration_id']
+
+            message = 'El estado de su delivery ahora es: ' + new_status
+            push.sendPushNotification(registration_id, 'Actualización de estado de compra', message)
 
             response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)

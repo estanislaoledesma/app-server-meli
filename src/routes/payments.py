@@ -4,6 +4,7 @@ from flask import request
 from ..settings import errorhandler, responsehandler
 from flask_api import status
 import pyrebase, pymongo, requests
+from ..models import push
 from bson.objectid import ObjectId
 from . import purchases
 
@@ -149,6 +150,16 @@ class PaymentStatus(Resource):
             delivery_id = purchase ['delivery_id']
 
             self.mongo.db.deliveries.update_one({"_id": ObjectId(delivery_id)}, {'$set': {'tracking_id': tracking_id}})
+
+            purchase = self.mongo.db.purchases.find_one({'payment_id': payment_id})
+            user_id = str(purchase['user_id'])
+
+            user = self.mongo.db.users.find_one({'uid': user_id})
+            self.logger.info('user : %s', user)
+            registration_id = user['registration_id']
+
+            message = 'El estado de su pago ahora es: ' + new_status
+            push.sendPushNotification(registration_id, 'Actualización de estado de compra', message)
 
             response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)

@@ -22,6 +22,7 @@ class SignUp(Resource):
             password = json_data['password']
             display_name = json_data['display_name']
             phone = json_data['phone']
+            registration_id = json_data['registration_id']
 
             if "" in [email, password, display_name, phone]:
                 raise ValueError
@@ -47,6 +48,7 @@ class SignUp(Resource):
             user_data['rating'] = 1
             user_data["compras"] = []
             user_data["ventas"] = []
+            user_data["registration_id"] = registration_id
             user_id = str(self.mongo.db.users.insert_one(user_data).inserted_id)
 
             response_data = {'userId': user['localId']}
@@ -76,16 +78,20 @@ class Login(Resource):
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
         self.firebase = kwargs.get('firebase')
+        self.mongo = kwargs.get('mongo')
 
     def post(self):
         json_data = request.get_json(force=True)
         email = json_data['email']
         password = json_data['password']
+        registration_id = json_data ['registration_id']
 
         auth = self.get_firebase().auth()
         try:
             user = auth.sign_in_with_email_and_password(email, password)
             self.logger.info('user : %s', user)
+
+            self.mongo.db.users.update_one({"uid": user ['localId']}, {'$set': {'registration_id': registration_id}})
 
             response_data = {'userId': user['localId']}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
