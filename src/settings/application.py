@@ -12,7 +12,9 @@ from .config import Config
 import logging
 import pyrebase
 import googlemaps
+import requests
 from datetime import datetime
+import time
 
 app = Flask(__name__)
 api = Api(app)
@@ -32,11 +34,27 @@ db = mongo.db
 
 gmaps = googlemaps.Client(key = 'AIzaSyDd_fCIYbz8xiusm7RjuTHZBzuSlL-UAtw')
 
+SHARED_SERVER_URL = "http://localhost:8080/server"
+
+server = {}
+server ['_rev'] = str(time.mktime(datetime.now().timetuple()))
+server ['createdBy'] = 'Developer'
+server ['createdTime'] = time.mktime(datetime.now().timetuple())
+server ['name'] = 'Meli'
+server ['lastConnection'] = time.mktime(datetime.now().timetuple())
+
+server_id = str(mongo.db.servers.insert_one(server).inserted_id)
+server ['id'] = server_id
+server.pop('_id', None)
+
 # Configuracion del logger
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
+
+response = requests.post(url = SHARED_SERVER_URL, json = server)
+app.logger.info(response.content)
 
 api.add_resource(hello.HelloWorld, '/', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(user.SignUp, '/users/signup', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
@@ -58,4 +76,4 @@ api.add_resource(activity.MyPurchases, '/mypurchases', resource_class_kwargs={'l
 api.add_resource(activity.MySales, '/mysales', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(deliveries.DeliveryStatus, '/deliveries/<tracking_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(payments.PaymentStatus, '/payments/<payment_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
-api.add_resource(statistics.Statistics, '/stats', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
+api.add_resource(statistics.Statistics, '/stats', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'server_id': server_id})

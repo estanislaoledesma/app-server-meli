@@ -26,7 +26,6 @@ class Deliveries(Resource):
                        DELIVERED: 'Entrega Realizada'}
 
     DELIVERIES_URL = "http://localhost:8080/delivery/estimate"
-    TRACKING_URL = "http://localhost:8080/tracking"
 
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
@@ -98,21 +97,7 @@ class Deliveries(Resource):
 
             delivery_id = self.mongo.db.deliveries.insert_one(delivery).inserted_id
 
-            tracking = {}
-            tracking ['id'] = str(delivery_id)
-            tracking ['status'] = Deliveries.DELIVERY_STATUS [Deliveries.PENDING_DELIVERY]
-
-            response = requests.post(url = self.TRACKING_URL, json = tracking)
-
-            if response.status_code != status.HTTP_201_CREATED:
-                error_message = response.content
-                error = errorhandler.ErrorHandler(status.HTTP_503_SERVICE_UNAVAILABLE, error_message)
-                return error.get_error_response()
-
-            purchase_update = {'delivery_id': str(delivery_id)}
-            self.mongo.db.purchases.update_one({'_id': ObjectId(purchase_id)}, {'$set': purchase_update})
-
-            response_data  = response.json()
+            response_data  = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
             return response.get_response()
@@ -228,7 +213,6 @@ class Estimates(Resource):
             delivery ['userscore'] = 0
             delivery ['mail'] = user_data ['email']
             delivery ['purchaseQuantity'] = purchase_amount
-
 
             response = requests.post(url = self.DELIVERIES_URL, json = delivery)
 

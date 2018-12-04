@@ -2,6 +2,7 @@
 from flask_restful import Resource
 from flask import request, redirect, url_for, jsonify
 from ..settings import errorhandler, responsehandler
+from bson.objectid import ObjectId
 from flask_api import status
 import pyrebase, pymongo
 
@@ -12,6 +13,7 @@ class Statistics(Resource):
         self.logger = kwargs.get('logger')
         self.mongo = kwargs.get('mongo')
         self.firebase = kwargs.get('firebase')
+        self.server_id = kwargs.get('server_id')
 
     def get(self):
         try:
@@ -24,9 +26,14 @@ class Statistics(Resource):
             purchases = self.mongo.db.purchases.find()
             purchase_amount = purchases.count()
 
+            server = self.mongo.db.servers.find_one({'_id': ObjectId(self.server_id)})
+            self.logger.info('server : %s', server)
+            created_time = server ['createdTime']
+
             response_data = {'registered_users': user_amount,
                              'products_for_sale': product_amount,
-                             'purchase_amount': purchase_amount}
+                             'purchase_amount': purchase_amount,
+                             'created_time': created_time}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
 
