@@ -53,8 +53,8 @@ if __name__ != '__main__':
     app.logger.handlers = gunicorn_logger.handlers
     app.logger.setLevel(gunicorn_logger.level)
 
-response = requests.post(url = SHARED_SERVER_URL, json = server)
-app.logger.info(response.content)
+#response = requests.post(url = SHARED_SERVER_URL, json = server)
+#app.logger.info(response.content)
 
 api.add_resource(hello.HelloWorld, '/', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(user.SignUp, '/users/signup', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
