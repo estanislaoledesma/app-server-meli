@@ -88,7 +88,9 @@ class Answers(Resource):
             self.logger.info('question : %s', question)
 
             json_data = request.get_json(force=True)
-            answer_str = json_data ['answer']
+            answer_str = json_data['answer']
+
+            self.mongo.db.questions.update({'_id': ObjectId(question_id)}, {'$set': {'answer': answer_str}})
 
             answer = {}
             answer ['question_id'] = str(question_id)
@@ -98,9 +100,9 @@ class Answers(Resource):
             answer_id = mongo.db.answers.insert_one(answer).inserted_id
             answer ['_id'] = str(answer_id)
 
-            response_data = answer
+            response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
-            response.add_autentication_header(user ['refreshToken'])
+            response.add_autentication_header(user['refreshToken'])
             return response.get_response()
 
         except IndexError as e:

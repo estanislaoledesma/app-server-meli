@@ -37,7 +37,7 @@ app.config['MONGO_URI'] = MONGO_URL
 mongo = PyMongo(app)
 db = mongo.db
 
-SHARED_SERVER_URL = "http://localhost:8080/server"
+SHARED_SERVER_URL = "http://melisharedserver.herokuapp.com/server"
 
 server = {}
 server ['_rev'] = str(time.mktime(datetime.now().timetuple()))

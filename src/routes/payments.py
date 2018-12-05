@@ -20,7 +20,7 @@ class Payments(Resource):
                        PAYMENT_ACCEPTED: 'Pago Aceptado',
                        PAYMENT_REJECTED: 'Pago Rechazado'}
 
-    PAYEMENTS_URL = "http://localhost:8080/payment"
+    PAYEMENTS_URL = "http://melisharedserver.herokuapp.com/payment"
 
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
