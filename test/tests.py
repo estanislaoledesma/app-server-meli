@@ -24,6 +24,9 @@ from test.testQuestions import TestQuestions
 from test.testAnswers import TestAnswers
 from test.testPing import TestPing
 from test.testSearch import TestSearch
+from test.testRating import TestRating
+from test.testMyPurchases import TestMyPurchases
+from test.testMySales import TestMySales
 
 if __name__ == '__main__':
     unittest.main()

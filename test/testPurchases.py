@@ -31,6 +31,7 @@ class TestPurchases(TestCase):
                         "value": 60
                     }
                 ]
+
     PRODUCT = {"_id": "5c06f868556f89598152f2eb",
                "name": "Producto Test",
                "description": "Producto de prueba",
