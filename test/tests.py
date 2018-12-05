@@ -6,6 +6,9 @@ import os
 from mock import MagicMock
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.modules['pyrebase'] = MagicMock()
+sys.modules['flask_pymongo'] = MagicMock()
+sys.modules['requests'] = MagicMock()
 sys.modules['gridfs'] = MagicMock()
 
 from test.testHelloWorld import TestHelloWorld

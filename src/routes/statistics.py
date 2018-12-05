@@ -152,8 +152,6 @@ class StatsProducts(Resource):
             for p in products:
                 response_data[p['month_created']] += 1
             
-            
-            
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
 
