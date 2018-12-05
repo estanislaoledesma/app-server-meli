@@ -16,6 +16,10 @@ from test.testProducts import TestProducts
 from test.testProduct import TestProduct
 from test.testPurchases import TestPurchases
 from test.testPayments import TestPayments
+from test.testPaymentStatus import TestPaymentStatus
+from test.testDeliveries import TestDeliveries
+from test.testEstimates import TestEstimates
+from test.testDeliveryStatus import TestDeliveryStatus
 
 if __name__ == '__main__':
     unittest.main()
