@@ -26,7 +26,7 @@ class Deliveries(Resource):
                        DELIVERY_IN_PROGRESS: 'Entrega en proceso',
                        DELIVERED: 'Entrega Realizada'}
 
-    DELIVERIES_URL = "http://localhost:8080/delivery/estimate"
+    DELIVERIES_URL = "http://melisharedserver.herokuapp.com/delivery/estimate"
 
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
@@ -170,8 +170,8 @@ class Deliveries(Resource):
 
 class Estimates(Resource):
 
-    DELIVERIES_URL = "http://localhost:8080/delivery/estimate"
-    TRACKING_URL = "http://localhost:8080/tracking"
+    DELIVERIES_URL = "http://melisharedserver.herokuapp.com/delivery/estimate"
+    TRACKING_URL = "http://melisharedserver.herokuapp.com/tracking"
 
     def __init__(self, **kwargs):
         self.logger = kwargs.get('logger')
