@@ -249,8 +249,9 @@ class Estimates(Resource):
                 return error.get_error_response()
 
             cost = response.json()
+            cost = cost ['cost'] ['value']
 
-            response_data  = cost
+            response_data  = {'cost': cost}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])
             return response.get_response()

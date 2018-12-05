@@ -53,6 +53,16 @@ class TestEstimates(TestCase):
                 "units": 1,
                 "user_id": "5c06f868556f89598152f2eb"}
 
+    COST = {
+                "cost": {
+                    "currency": "ARS",
+                    "value": 15.526744977904434
+                },
+                "metadata": {
+                    "version": "1.0.0"
+                }
+            }
+
     def setUp(self):
         app.testing = True
         self.app = app.test_client()
@@ -98,7 +108,7 @@ class TestEstimates(TestCase):
 
         mockResponse = MagicMock()
         type(mockResponse).status_code = status.HTTP_200_OK
-        mockResponse.json.return_value = {'cost': '5'}
+        mockResponse.json.return_value = TestEstimates.COST
 
         mock_requests.post.return_value = mockResponse
 
