@@ -5,6 +5,7 @@ from ..settings import errorhandler, responsehandler
 from flask_api import status
 import pyrebase, pymongo
 import base64
+import datetime
 from gridfs import GridFS
 from bson import ObjectId
 
@@ -103,6 +104,7 @@ class Products(Resource):
             product_to_publish ['units'] = product ['units']
             product_to_publish ['user_id'] = user ['userId']
             product_to_publish ['currency'] = self.CURRENCY
+            product_to_publish['month_created'] = datetime.datetime.now().strftime("%b")
 
             mongo = self.get_mongo()
             product_id = mongo.db.products.insert_one(product_to_publish).inserted_id

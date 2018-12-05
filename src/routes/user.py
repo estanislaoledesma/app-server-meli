@@ -4,6 +4,7 @@ from flask_restful import Resource
 from flask import request, redirect, url_for, jsonify
 from ..settings import errorhandler, responsehandler
 import pyrebase
+import datetime
 from flask_api import status
 
 TOKEN = 1
@@ -50,6 +51,8 @@ class SignUp(Resource):
             user_data["compras"] = []
             user_data["ventas"] = []
             user_data["registration_id"] = registration_id
+            user_data['month_created'] = datetime.datetime.now().strftime("%b")
+            
 
             mongo = self.get_mongo()
             user_id = str(mongo.db.users.insert_one(user_data).inserted_id)

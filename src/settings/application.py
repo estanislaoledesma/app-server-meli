@@ -72,4 +72,14 @@ api.add_resource(activity.MyPurchases, '/mypurchases', resource_class_kwargs={'l
 api.add_resource(activity.MySales, '/mysales', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(deliveries.DeliveryStatus, '/deliveries/<tracking_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(payments.PaymentStatus, '/payments/<payment_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
-api.add_resource(statistics.Statistics, '/stats', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'server_id': server_id})
+api.add_resource(statistics.StatsUsers, '/stats/users', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'server_id': server_id})
+api.add_resource(statistics.StatsSales, '/stats/sales', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'server_id': server_id})
+api.add_resource(statistics.StatsProducts, '/stats/products', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'server_id': server_id})
+
+
+
+
+
+
+
+

@@ -4,6 +4,7 @@ from flask import request
 from ..settings import errorhandler, responsehandler
 from flask_api import status
 import pyrebase, pymongo
+import datetime
 from bson.objectid import ObjectId
 
 TOKEN = 1
@@ -130,6 +131,7 @@ class Purchases(Resource):
             purchase ['units'] = units
             purchase ['currency'] = product ['currency']
             purchase ['value'] = units * product ['price']
+            purchase['month_created'] = datetime.datetime.now().strftime("%b")
 
             purchase_id = mongo.db.purchases.insert_one(purchase).inserted_id
             

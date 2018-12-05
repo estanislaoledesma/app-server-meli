@@ -554,10 +554,36 @@ paths:
           description: "Unexpected error"
           schema:
             $ref: "#/definitions/Error"
-  /stats:
+  /stats/users:
     get:
       description: |
-        Datos del uso del servidor
+        Datos de usuarios registrados el último año
+      responses:
+        200:
+          description: "Obtenciòn de datos exitosa"
+          schema:
+            $ref: "#/definitions/ServerStats"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+  /stats/sales:
+    get:
+      description: |
+        Datos de ventas realizadas el último año
+      responses:
+        200:
+          description: "Obtenciòn de datos exitosa"
+          schema:
+            $ref: "#/definitions/ServerStats"
+        500:
+          description: "Unexpected error"
+          schema:
+            $ref: "#/definitions/Error"
+  /stats/products:
+    get:
+      description: |
+        Datos de productos publicados en el ultimo año
       responses:
         200:
           description: "Obtenciòn de datos exitosa"
