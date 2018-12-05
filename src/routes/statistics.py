@@ -25,30 +25,29 @@ class StatsUsers(Resource):
         return self.logger
 
     def get(self):
-        try:
-            mongo = self.get_mongo()
-            users = mongo.db.users.find()
-            user_amount = users.count()
-            
-            response_data = {'total_users': user_amount,
-                             'Jan': 0,
-                             'Feb': 0,
-                             'Mar': 0,
-                             'Apr': 0,
-                             'May': 0,
-                             'Jun': 0,
-                             'Jul': 0,
-                             'Aug': 0,
-                             'Sep': 0,
-                             'Oct': 0,
-                             'Nov': 0,
-                             'Dec': 0
-                             }
-            
-            for u in users:
+        mongo = self.get_mongo()
+        users = mongo.db.users.find()
+        user_amount = users.count()
+        
+        response_data = {'total_users': user_amount,
+                         'Jan': 0,
+                         'Feb': 0,
+                         'Mar': 0,
+                         'Apr': 0,
+                         'May': 0,
+                         'Jun': 0,
+                         'Jul': 0,
+                         'Aug': 0,
+                         'Sep': 0,
+                         'Oct': 0,
+                         'Nov': 0,
+                         'Dec': 0
+                         }
+        
+        for u in users:
+            if 'month_created' in u:
                 response_data[u['month_created']] += 1
-            
-            
+        try:
             
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
@@ -77,31 +76,30 @@ class StatsSales(Resource):
         return self.logger
 
     def get(self):
+        mongo = self.get_mongo()
+        sales = mongo.db.purchases.find()
+        sales_amount = sales.count()
+        
+        response_data = {'total_purchases': sales_amount,
+                         'Jan': 0,
+                         'Feb': 0,
+                         'Mar': 0,
+                         'Apr': 0,
+                         'May': 0,
+                         'Jun': 0,
+                         'Jul': 0,
+                         'Aug': 0,
+                         'Sep': 0,
+                         'Oct': 0,
+                         'Nov': 0,
+                         'Dec': 0
+                         }
+        
+        for s in sales:
+            if 'month_created' in u:
+                response_data[u['month_created']] += 1
+        
         try:
-            mongo = self.get_mongo()
-            sales = mongo.db.purchases.find()
-            sales_amount = sales.count()
-            
-            response_data = {'total_purchases': sales_amount,
-                             'Jan': 0,
-                             'Feb': 0,
-                             'Mar': 0,
-                             'Apr': 0,
-                             'May': 0,
-                             'Jun': 0,
-                             'Jul': 0,
-                             'Aug': 0,
-                             'Sep': 0,
-                             'Oct': 0,
-                             'Nov': 0,
-                             'Dec': 0
-                             }
-            
-            for s in sales:
-                response_data[s['month_created']] += 1
-            
-            
-            
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
 
@@ -129,29 +127,30 @@ class StatsProducts(Resource):
         return self.logger
 
     def get(self):
+        mongo = self.get_mongo()
+        products = mongo.db.products.find()
+        products_amount = products.count()
+        
+        response_data = {'total_products': products_amount,
+                         'Jan': 0,
+                         'Feb': 0,
+                         'Mar': 0,
+                         'Apr': 0,
+                         'May': 0,
+                         'Jun': 0,
+                         'Jul': 0,
+                         'Aug': 0,
+                         'Sep': 0,
+                         'Oct': 0,
+                         'Nov': 0,
+                         'Dec': 0
+                         }
+        
+        for p in products:
+            if 'month_created' in u:
+                response_data[u['month_created']] += 1
+        
         try:
-            mongo = self.get_mongo()
-            products = mongo.db.products.find()
-            products_amount = products.count()
-            
-            response_data = {'total_products': products_amount,
-                             'Jan': 0,
-                             'Feb': 0,
-                             'Mar': 0,
-                             'Apr': 0,
-                             'May': 0,
-                             'Jun': 0,
-                             'Jul': 0,
-                             'Aug': 0,
-                             'Sep': 0,
-                             'Oct': 0,
-                             'Nov': 0,
-                             'Dec': 0
-                             }
-            
-            for p in products:
-                response_data[p['month_created']] += 1
-            
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             return response.get_response()
 
