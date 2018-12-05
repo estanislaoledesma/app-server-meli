@@ -9,6 +9,8 @@ from unittest import TestCase
 from mock import patch, MagicMock, PropertyMock
 
 sys.modules['pyrebase'] = MagicMock()
+sys.modules['flask_pymongo'] = MagicMock()
+sys.modules['requests'] = MagicMock()
 from src.settings.application import app
 
 class TestPurchases(TestCase):
