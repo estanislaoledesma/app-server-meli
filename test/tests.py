@@ -20,6 +20,10 @@ from test.testPaymentStatus import TestPaymentStatus
 from test.testDeliveries import TestDeliveries
 from test.testEstimates import TestEstimates
 from test.testDeliveryStatus import TestDeliveryStatus
+from test.testQuestions import TestQuestions
+from test.testAnswers import TestAnswers
+from test.testPing import TestPing
+from test.testSearch import TestSearch
 
 if __name__ == '__main__':
     unittest.main()
