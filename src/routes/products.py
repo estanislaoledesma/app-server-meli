@@ -81,7 +81,6 @@ class Products(Resource):
     def post(self):
         try:
             # Authentication
-
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
             firebase = self.get_firebase()

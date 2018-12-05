@@ -8,7 +8,6 @@ from flask_pymongo import PyMongo
 from src.routes import hello, user, products, product, \
     purchases, payments, deliveries, questions, answers, \
     search, ping, rating, activity, statistics
-from .config import Config
 import logging
 import pyrebase
 import requests
@@ -20,7 +19,14 @@ api = Api(app)
 ma = Marshmallow(app)
 
 # Configuracion de Firebase
-firebase = pyrebase.initialize_app(Config.setup)
+setup = {
+        "apiKey": "AIzaSyD3s0dTCy3J4v_3FitnlF_K2qTzsevIIBg",
+        "authDomain": "meli-4620b.firebaseapp.com",
+        "databaseURL": "https://meli-4620b.firebaseio.com",
+        "storageBucket": "meli-4620b.appspot.com",
+        "serviceAccount": 'src/settings/meli-4620b-firebase-adminsdk-8c1z7-b12f7ba600.json'
+    }
+firebase = pyrebase.initialize_app(setup)
 
 #Configuracion de mongodb
 MONGO_URL = os.environ.get('MONGO_URL')
