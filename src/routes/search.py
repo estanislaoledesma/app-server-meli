@@ -27,12 +27,25 @@ class Search(Resource):
         self.firebase = kwargs.get('firebase')
         self.fs = GridFS(self.mongo.db)
 
+    def get_firebase(self):
+        return self.firebase
+
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
+
+    def get_fs(self):
+        return self.fs
+
     def get(self):
         try:
             # Authentication
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
             parser = reqparse.RequestParser()
@@ -61,15 +74,14 @@ class Search(Resource):
 
             search_category = args ['category']
 
-
-            products_cursor = self.mongo.db.products.find({'name': {'$regex': '.*' + search_name + '.*', '$options': 'i'},
+            mongo = self.get_mongo()
+            products_cursor = mongo.db.products.find({'name': {'$regex': '.*' + search_name + '.*', '$options': 'i'},
                                                            'description': {'$regex': '.*' + search_description + '.*', '$options': 'i'},
                                                            'price': {'$gte': search_lowest_price, '$lte': search_greatest_price},
                                                            'category': {'$regex': '.*' + search_category + '.*', '$options': 'i'}})
 
             products = []
             for product in products_cursor:
-                #TODO filter by location
                 self.logger.info(product)
                 product_to_display = {}
                 product_to_display ['name'] = product ['name']
@@ -78,7 +90,7 @@ class Search(Resource):
                     product_to_display ['thumbnail'] = self.encode_image(product ['images'] [THUMBNAIL])
                 product_to_display ['_id'] = str(product ['_id'])
 
-                user_data = self.mongo.db.users.find_one({"uid": user ['userId']})
+                user_data = mongo.db.users.find_one({"uid": user ['userId']})
                 self.logger.info('user data : %s', user_data)
                 product_to_display ['user_name'] = user_data['display_name']
                 product_to_display ['user_rating'] = user_data['rating']
@@ -118,12 +130,14 @@ class Search(Resource):
         i = 0
         for image in encoded_images:
             name = product_name + str(i)
-            fs_id = self.fs.put(base64.b64decode(image), filename=name)
+            fs = self.get_fs()
+            fs_id = fs.put(base64.b64decode(image), filename=name)
             images.append(name)
             i+=1
 
         return images
 
     def encode_image(self, image_name):
-        image = self.fs.get_last_version(filename=image_name).read()
+        fs = self.get_fs()
+        image = fs.get_last_version(filename=image_name).read()
         return str(base64.b64encode(image), 'utf-8')

@@ -15,18 +15,28 @@ class Statistics(Resource):
         self.firebase = kwargs.get('firebase')
         self.server_id = kwargs.get('server_id')
 
+    def get_firebase(self):
+        return self.firebase
+
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
+
     def get(self):
         try:
-            users = self.mongo.db.users.find()
+            mongo = self.get_mongo()
+            users = mongo.db.users.find()
             user_amount = users.count()
 
-            products = self.mongo.db.products.find()
+            products = mongo.db.products.find()
             product_amount = products.count()
 
-            purchases = self.mongo.db.purchases.find()
+            purchases = mongo.db.purchases.find()
             purchase_amount = purchases.count()
 
-            server = self.mongo.db.servers.find_one({'_id': ObjectId(self.server_id)})
+            server = mongo.db.servers.find_one({'_id': ObjectId(self.server_id)})
             self.logger.info('server : %s', server)
             created_time = server ['createdTime']
 

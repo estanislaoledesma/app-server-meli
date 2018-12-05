@@ -6,12 +6,10 @@ from flask_restful import Api
 from flask_marshmallow import Marshmallow
 from flask_pymongo import PyMongo
 from src.routes import hello, user, products, product, \
-    purchases, payments, deliveries, trackings, questions, answers, \
+    purchases, payments, deliveries, questions, answers, \
     search, ping, rating, activity, statistics
-from .config import Config
 import logging
 import pyrebase
-import googlemaps
 import requests
 from datetime import datetime
 import time
@@ -21,7 +19,14 @@ api = Api(app)
 ma = Marshmallow(app)
 
 # Configuracion de Firebase
-firebase = pyrebase.initialize_app(Config.setup)
+setup = {
+        "apiKey": "AIzaSyD3s0dTCy3J4v_3FitnlF_K2qTzsevIIBg",
+        "authDomain": "meli-4620b.firebaseapp.com",
+        "databaseURL": "https://meli-4620b.firebaseio.com",
+        "storageBucket": "meli-4620b.appspot.com",
+        "serviceAccount": 'src/settings/meli-4620b-firebase-adminsdk-8c1z7-b12f7ba600.json'
+    }
+firebase = pyrebase.initialize_app(setup)
 
 #Configuracion de mongodb
 MONGO_URL = os.environ.get('MONGO_URL')
@@ -31,8 +36,6 @@ if not MONGO_URL:
 app.config['MONGO_URI'] = MONGO_URL
 mongo = PyMongo(app)
 db = mongo.db
-
-gmaps = googlemaps.Client(key = 'AIzaSyDd_fCIYbz8xiusm7RjuTHZBzuSlL-UAtw')
 
 SHARED_SERVER_URL = "http://localhost:8080/server"
 
@@ -64,14 +67,13 @@ api.add_resource(products.Products, '/products', resource_class_kwargs={'logger'
 api.add_resource(product.Product, '/products/<product_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(purchases.Purchases, '/products/<product_id>/purchases', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(payments.Payments, '/purchases/<purchase_id>/payments', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
-api.add_resource(deliveries.Deliveries, '/purchases/<purchase_id>/deliveries', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'gmaps': gmaps})
-api.add_resource(trackings.Trackings, '/purchases/<purchase_id>/trackings', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'gmaps': gmaps})
+api.add_resource(deliveries.Deliveries, '/purchases/<purchase_id>/deliveries', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(questions.Questions, '/products/<product_id>/questions', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(answers.Answers, '/questions/<question_id>/answers', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
-api.add_resource(search.Search, '/products/search', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'gmaps': gmaps})
+api.add_resource(search.Search, '/products/search', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(ping.Ping, '/ping', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(rating.Rating, '/users/<user_id>/score', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
-api.add_resource(deliveries.Estimates, '/products/<product_id>/deliveries/estimate', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo, 'gmaps': gmaps})
+api.add_resource(deliveries.Estimates, '/products/<product_id>/deliveries/estimate', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(activity.MyPurchases, '/mypurchases', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(activity.MySales, '/mysales', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})
 api.add_resource(deliveries.DeliveryStatus, '/deliveries/<tracking_id>', resource_class_kwargs={'logger': app.logger, 'firebase': firebase, 'mongo': mongo})

@@ -20,16 +20,29 @@ class Products(Resource):
         self.mongo = kwargs.get('mongo')
         self.firebase = kwargs.get('firebase')
         self.fs = GridFS(self.mongo.db)
-        self.gmaps = kwargs.get('gmaps')
+
+    def get_firebase(self):
+        return self.firebase
+
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
+
+    def get_fs(self):
+        return self.fs
 
     def get(self):
         try:
             # Authentication
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
+            mongo = self.get_mongo()
             products_cursor = self.mongo.db.products.find()
 
             products = []
@@ -67,10 +80,10 @@ class Products(Resource):
     def post(self):
         try:
             # Authentication
-
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
             json_data = request.get_json(force=True)
@@ -90,7 +103,8 @@ class Products(Resource):
             product_to_publish ['user_id'] = user ['userId']
             product_to_publish ['currency'] = self.CURRENCY
 
-            product_id = self.mongo.db.products.insert_one(product_to_publish).inserted_id
+            mongo = self.get_mongo()
+            product_id = mongo.db.products.insert_one(product_to_publish).inserted_id
             product_to_publish ['_id'] = str(product_id)
 
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, {})
@@ -123,11 +137,13 @@ class Products(Resource):
         i = 0
         for image in encoded_images:
             name = product_name + str(i)
-            fs_id = self.fs.put(base64.b64decode(image), filename=name)
+            fs = self.get_fs()
+            fs_id = fs.put(base64.b64decode(image), filename=name)
             images.append(name)
             i+=1
         return images
 
     def encode_image(self, image_name):
-        image = self.fs.get_last_version(filename=image_name).read()
+        fs = self.get_fs()
+        image = fs.get_last_version(filename=image_name).read()
         return str(base64.b64encode(image), 'utf-8')

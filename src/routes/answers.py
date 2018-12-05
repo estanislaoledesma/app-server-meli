@@ -15,15 +15,26 @@ class Answers(Resource):
         self.mongo = kwargs.get('mongo')
         self.firebase = kwargs.get('firebase')
 
+    def get_firebase(self):
+        return self.firebase
+
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
+
     def get(self, question_id):
         try:
             # Authentication
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
-            answers_cursor = self.mongo.db.answers.find({'question_id': question_id})
+            mongo = self.get_mongo()
+            answers_cursor = mongo.db.answers.find({'question_id': question_id})
 
             answers = []
             for answer in answers_cursor:
@@ -68,26 +79,27 @@ class Answers(Resource):
             # Authentication
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
-#            question = self.mongo.db.questions.find_one({'_id': ObjectId(question_id)})
-#            self.logger.info('question : %s', question)
+            mongo = self.get_mongo()
+            question = mongo.db.questions.find_one({'_id': ObjectId(question_id)})
+            self.logger.info('question : %s', question)
 
             json_data = request.get_json(force=True)
             answer_str = json_data['answer']
 
             self.mongo.db.questions.update({'_id': ObjectId(question_id)}, {'$set': {'answer': answer_str}})
 
-#            answer = {}
-#            answer ['question_id'] = str(question_id)
-#            answer ['user_id'] = user ['userId']
-#            answer ['answer'] = answer_str
+            answer = {}
+            answer ['question_id'] = str(question_id)
+            answer ['user_id'] = user ['userId']
+            answer ['answer'] = answer_str
 
-#            answer_id = self.mongo.db.answers.insert_one(answer).inserted_id
-#            answer ['_id'] = str(answer_id)
+            answer_id = mongo.db.answers.insert_one(answer).inserted_id
+            answer ['_id'] = str(answer_id)
 
-#            response_data = answer
             response_data = {}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
             response.add_autentication_header(user['refreshToken'])

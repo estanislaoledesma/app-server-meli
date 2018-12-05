@@ -18,15 +18,29 @@ class Product(Resource):
         self.firebase = kwargs.get('firebase')
         self.fs = GridFS(self.mongo.db)
 
+    def get_firebase(self):
+        return self.firebase
+
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
+
+    def get_fs(self):
+        return self.fs
+
     def get(self, product_id):
         try:
             # Authentication
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
-            product = self.mongo.db.products.find_one({'_id': ObjectId(product_id)})
+            mongo = self.get_mongo()
+            product = mongo.db.products.find_one({'_id': ObjectId(product_id)})
             self.logger.info('product : %s', product)
 
             product_to_display = {}
@@ -40,7 +54,7 @@ class Product(Resource):
             product_to_display ['units'] = product ['units']
 
             self.logger.info('user : %s', user)
-            user_data = self.mongo.db.users.find_one({"uid": user ['userId']})
+            user_data = mongo.db.users.find_one({"uid": user ['userId']})
             self.logger.info('user data : %s', user_data)
             product_to_display ['display_name'] = user_data ['display_name']
             product_to_display ['ubication'] = product ['ubication']
@@ -71,5 +85,6 @@ class Product(Resource):
         return l
 
     def encode_image(self, image_name):
-        image = self.fs.get_last_version(filename=image_name).read()
+        fs = self.get_fs()
+        image = fs.get_last_version(filename=image_name).read()
         return str(base64.b64encode(image), 'utf-8')

@@ -13,6 +13,15 @@ class MyPurchases(Resource):
         self.logger = kwargs.get('logger')
         self.firebase = kwargs.get('firebase')
         self.mongo = kwargs.get('mongo')
+
+    def get_firebase(self):
+        return self.firebase
+
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
         
     def get(self):
         try:
@@ -20,15 +29,17 @@ class MyPurchases(Resource):
             if not auth_header:
                 raise IndexError
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
-            purchases_cursor = self.mongo.db.purchases.find({"user_id": user['userId']})
+            mongo = self.get_mongo()
+            purchases_cursor = mongo.db.purchases.find({"user_id": user['userId']})
             self.logger.info('user : %s', purchases_cursor)
             
             purchases = []
             for purchase in purchases_cursor:
-                product = self.mongo.db.products.find_one({"_id": ObjectId(purchase['product_id'])})
+                product = mongo.db.products.find_one({"_id": ObjectId(purchase['product_id'])})
                 self.logger.info(purchase)
                 purchase_to_display = {}
                 purchase_to_display['product_name'] = product['name']
@@ -65,22 +76,33 @@ class MySales(Resource):
         self.logger = kwargs.get('logger')
         self.firebase = kwargs.get('firebase')
         self.mongo = kwargs.get('mongo')
-        
+
+    def get_firebase(self):
+        return self.firebase
+
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
+
     def get(self):
         try:
             auth_header = request.headers.get('Authorization')
             if not auth_header:
                 raise IndexError
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
-            products_cursor = self.mongo.db.products.find({"user_id": user['userId']})
+            mongo = self.get_mongo()
+            products_cursor = mongo.db.products.find({"user_id": user['userId']})
             self.logger.info('user : %s', products_cursor)
 
             sales = []
             for product in products_cursor:
-                purchases_cursor = self.mongo.db.purchases.find({"product_id": str(product['_id'])})
+                purchases_cursor = mongo.db.purchases.find({"product_id": str(product['_id'])})
                 self.logger.info(purchases_cursor)
 
                 for purchase in purchases_cursor:

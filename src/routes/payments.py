@@ -27,12 +27,22 @@ class Payments(Resource):
         self.mongo = kwargs.get('mongo')
         self.firebase = kwargs.get('firebase')
 
+    def get_firebase(self):
+        return self.firebase
+
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
+
     def post(self, purchase_id):
         try:
             # Authentication
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
             json_data = request.get_json(force=True)
@@ -43,7 +53,8 @@ class Payments(Resource):
             card_expiration_month = json_data['card_expiration_month']
             card_holder = json_data['card_holder']
 
-            purchase = self.mongo.db.purchases.find_one({'_id': ObjectId(purchase_id)})
+            mongo = self.get_mongo()
+            purchase = mongo.db.purchases.find_one({'_id': ObjectId(purchase_id)})
             self.logger.info('purchase : %s', purchase)
 
             payment_method = {}
@@ -59,7 +70,7 @@ class Payments(Resource):
             payment ['paymentMethod'] = payment_method
             payment ['status'] = Payments.PAYMENT_STATUS [Payments.PENDING_PAYMENT_PROCESS]
 
-            payment_id = self.mongo.db.payments.insert_one(payment).inserted_id
+            payment_id = mongo.db.payments.insert_one(payment).inserted_id
 
             payment ['transaction_id'] = str(payment_id)
             payment.pop('_id', None)
@@ -73,7 +84,7 @@ class Payments(Resource):
                 return error.get_error_response()
 
             purchase_update = {'payment_id': str(payment_id)}
-            self.mongo.db.purchases.update_one({'_id': ObjectId(purchase_id)}, {'$set': purchase_update})
+            mongo.db.purchases.update_one({'_id': ObjectId(purchase_id)}, {'$set': purchase_update})
 
             response_data = {'payment_id': str(payment_id)}
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
@@ -98,13 +109,15 @@ class Payments(Resource):
             # Authentication
             auth_header = request.headers.get('Authorization')
             auth_token = auth_header.split(" ")[TOKEN]
-            auth = self.firebase.auth()
+            firebase = self.get_firebase()
+            auth = firebase.auth()
             user = auth.refresh(auth_token)
 
-            purchase = self.mongo.db.purchases.find_one({'_id': ObjectId(purchase_id)})
+            mongo = self.get_mongo()
+            purchase = mongo.db.purchases.find_one({'_id': ObjectId(purchase_id)})
             self.logger.info('purchase : %s', purchase)
 
-            payment = self.mongo.db.payments.find_one({'_id': ObjectId(purchase ['payment_id'])})
+            payment = mongo.db.payments.find_one({'_id': ObjectId(purchase ['payment_id'])})
             self.logger.info('payment : %s', payment)
 
             payment ['_id'] = str(payment ['_id'])
@@ -133,7 +146,15 @@ class PaymentStatus(Resource):
         self.logger = kwargs.get('logger')
         self.mongo = kwargs.get('mongo')
         self.firebase = kwargs.get('firebase')
-        self.gmaps = kwargs.get('gmaps')
+
+    def get_firebase(self):
+        return self.firebase
+
+    def get_mongo(self):
+        return self.mongo
+
+    def get_logger(self):
+        return self.logger
 
     def put(self, payment_id):
         try:
@@ -142,19 +163,20 @@ class PaymentStatus(Resource):
             new_status = json_data ['status']
             tracking_id = json_data ['tracking_id']
 
-            self.mongo.db.payments.update_one({"_id": ObjectId(payment_id)}, {'$set': {'status': new_status}})
+            mongo = self.get_mongo()
+            mongo.db.payments.update_one({"_id": ObjectId(payment_id)}, {'$set': {'status': new_status}})
 
-            purchase = self.mongo.db.purchases.find_one({'payment_id': payment_id})
+            purchase = mongo.db.purchases.find_one({'payment_id': payment_id})
             self.logger.info('purchase : %s', purchase)
 
             delivery_id = purchase ['delivery_id']
 
-            self.mongo.db.deliveries.update_one({"_id": ObjectId(delivery_id)}, {'$set': {'tracking_id': tracking_id}})
+            mongo.db.deliveries.update_one({"_id": ObjectId(delivery_id)}, {'$set': {'tracking_id': tracking_id}})
 
-            purchase = self.mongo.db.purchases.find_one({'payment_id': payment_id})
+            purchase = mongo.db.purchases.find_one({'payment_id': payment_id})
             user_id = str(purchase['user_id'])
 
-            user = self.mongo.db.users.find_one({'uid': user_id})
+            user = mongo.db.users.find_one({'uid': user_id})
             self.logger.info('user : %s', user)
             registration_id = user['registration_id']
 
