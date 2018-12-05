@@ -46,8 +46,13 @@ class TestSignUp(TestCase):
         mockUsers = MagicMock()
         mockUsers.insert_one.return_value = mockUser
 
-        p = PropertyMock(return_value = mockUsers)
-        type(mock_get_mongo.db).users = p
+        mockDB = MagicMock()
+        p = PropertyMock(return_value=mockUsers)
+        type(mockDB).users = p
+
+        mockMongo = MagicMock()
+        mock_get_mongo.return_value = mockMongo
+        type(mockMongo).db = PropertyMock(return_value=mockDB)
 
         response = self.app.post('/users/signup', json = sign_up_json)
         assert status.is_success(response.status_code)

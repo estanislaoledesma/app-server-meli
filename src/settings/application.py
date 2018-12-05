@@ -8,7 +8,6 @@ from flask_pymongo import PyMongo
 from src.routes import hello, user, products, product, \
     purchases, payments, deliveries, questions, answers, \
     search, ping, rating, activity, statistics
-from .config import Config
 import logging
 import pyrebase
 import requests

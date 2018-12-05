@@ -58,8 +58,13 @@ class TestProducts(TestCase):
         mockProducts = MagicMock()
         mockProducts.find.return_value = TestProducts.PRODUCTS
 
+        mockDB = MagicMock()
         p = PropertyMock(return_value = mockProducts)
-        type(mock_get_mongo.db).users = p
+        type(mockDB).products = p
+
+        mockMongo = MagicMock()
+        mock_get_mongo.return_value =  mockMongo
+        type(mockMongo).db = PropertyMock(return_value = mockDB)
 
         response = self.app.get('/products')
         assert status.is_success(response.status_code)
@@ -79,8 +84,13 @@ class TestProducts(TestCase):
         mockUsers = MagicMock()
         mockUsers.insert_one.return_value = mockUser
 
-        p = PropertyMock(return_value=mockUsers)
-        type(mock_get_mongo.db).users = p
+        mockDB = MagicMock()
+        p = PropertyMock(return_value = mockUsers)
+        type(mockDB).users = p
+
+        mockMongo = MagicMock()
+        mock_get_mongo.return_value =  mockMongo
+        type(mockMongo).db = PropertyMock(return_value = mockDB)
 
         response = self.app.post('/products', json = TestProducts.PRODUCT)
         assert status.is_success(response.status_code)

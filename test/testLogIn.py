@@ -38,8 +38,13 @@ class TestLogIn(TestCase):
         mockUsers = MagicMock()
         mockUsers.update_one.return_value = {'_id': "testId"}
 
+        mockDB = MagicMock()
         p = PropertyMock(return_value = mockUsers)
-        type(mock_get_mongo.db).users = p
+        type(mockDB).users = p
+
+        mockMongo = MagicMock()
+        mock_get_mongo.return_value =  mockMongo
+        type(mockMongo).db = PropertyMock(return_value = mockDB)
 
         response = self.app.post('/users/login', json = log_in_json)
         assert status.is_success(response.status_code)
