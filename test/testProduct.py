@@ -28,6 +28,13 @@ class TestProduct(TestCase):
                 "units": 1,
                 "user_id": "5c06f868556f89598152f2eb"}
 
+    USER = {'display_name': 'display_name',
+            'email': 'email',
+            'password': 'password',
+            'phone': 'phone',
+            'registration_id': 'registration_id',
+            'rating': 1}
+
     def setUp(self):
         app.testing = True
         self.app = app.test_client()
@@ -50,6 +57,12 @@ class TestProduct(TestCase):
         mockDB = MagicMock()
         p = PropertyMock(return_value = mockProduct)
         type(mockDB).products = p
+
+        mockUsers = MagicMock()
+        mockUsers.find_one.return_value = TestProduct.USER
+
+        p1 = PropertyMock(return_value = mockUsers)
+        type(mockDB).users = p1
 
         mockMongo = MagicMock()
         mock_get_mongo.return_value =  mockMongo

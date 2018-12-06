@@ -156,6 +156,7 @@ class TestEstimates(TestCase):
 
         mockResponse = MagicMock()
         type(mockResponse).status_code = status.HTTP_400_BAD_REQUEST
+        type(mockResponse).content = {'content': 'content'}
         mockResponse.json.return_value = {'cost': '5'}
 
         mock_requests.post.return_value = mockResponse
