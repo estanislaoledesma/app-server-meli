@@ -242,6 +242,7 @@ class Estimates(Resource):
             delivery ['purchaseQuantity'] = purchase_amount
 
             response = requests.post(url = self.DELIVERIES_URL, json = delivery)
+            self.logger.info('estimate response : %s', response.content)
 
             if response.status_code != status.HTTP_200_OK:
                 error_message = response.content
