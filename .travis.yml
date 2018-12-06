@@ -5,8 +5,8 @@ python:
   
 install:
   - pip install -r requirements.txt
-  - pip install --user coverage
-  - pip install --user codecov
+  - pip install coverage
+  - pip install codecov
 
 script:
   - coverage run test/tests.py
