@@ -16,4 +16,5 @@ gunicorn -w <No_Of_Workers> src.server:app
 ## Documentos
 
 [Manual de Usuario](https://docs.google.com/document/d/10grr-TEky_t54K10r6Id9k1ZLeeAz-yt8_viIT_9qqU/edit?usp=sharing)
+
 [Definiciones de Diseño y Arquitectura](https://docs.google.com/document/d/1gFpoZqph1Wu6w0HQnk_allr0uSNBMnI-DyFDHyPwzHw/edit?usp=sharing)
