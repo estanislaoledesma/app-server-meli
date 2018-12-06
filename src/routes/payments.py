@@ -188,7 +188,18 @@ class PaymentStatus(Resource):
             return response.get_response()
 
         except ValueError as e:
+            self.logger.error('error : %s', e)
             error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
+            return error.get_error_response()
+
+        except TypeError as e:
+            self.logger.error('error : %s', e)
+            error = errorhandler.ErrorHandler(status.HTTP_400_BAD_REQUEST, 'Bad info')
+            return error.get_error_response()
+
+        except Exception as e:
+            self.logger.error('error : %s', e)
+            error = errorhandler.ErrorHandler(status.HTTP_500_INTERNAL_SERVER_ERROR, 'Error de comunicación con el server')
             return error.get_error_response()
 
 

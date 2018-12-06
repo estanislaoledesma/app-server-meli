@@ -133,6 +133,7 @@ class TestPayments(TestCase):
 
         mockResponse = MagicMock()
         type(mockResponse).status_code = status.HTTP_400_BAD_REQUEST
+        type(mockResponse).content = {'content': 'content'}
 
         mock_requests.post.return_value = mockResponse
 

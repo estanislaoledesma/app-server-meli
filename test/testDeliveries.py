@@ -10,7 +10,6 @@ from mock import patch, MagicMock, PropertyMock
 
 sys.modules['pyrebase'] = MagicMock()
 sys.modules['flask_pymongo'] = MagicMock()
-sys.modules['requests'] = MagicMock()
 from src.settings.application import app
 
 class TestDeliveries(TestCase):
@@ -133,7 +132,7 @@ class TestDeliveries(TestCase):
         type(mockDB).products = p2
 
         mockMongo = MagicMock()
-        mock_get_mongo.return_value =  mockMongo
+        mock_get_mongo.return_value = mockMongo
         type(mockMongo).db = PropertyMock(return_value = mockDB)
 
         mockPurchases = MagicMock()
@@ -147,6 +146,7 @@ class TestDeliveries(TestCase):
         mockResponse = MagicMock()
         type(mockResponse).status_code = status.HTTP_400_BAD_REQUEST
         mockResponse.json.return_value = {'cost': '5'}
+        type(mockResponse).content = {'content': 'content'}
 
         mock_requests.post.return_value = mockResponse
 
