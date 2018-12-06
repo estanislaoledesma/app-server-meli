@@ -134,7 +134,7 @@ class MySales(Resource):
                     if 'payment_id' in purchase:
                         payment = mongo.db.payments.find_one({"_id": ObjectId(purchase['payment_id'])})
                         purchase_to_display['payment_status'] = payment['status']
-                    purchases.append(purchase_to_display)
+                    sales.append(purchase_to_display)
 
             response_data = sales
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
