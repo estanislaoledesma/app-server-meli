@@ -47,6 +47,17 @@ class MyPurchases(Resource):
                 purchase_to_display['currency'] = purchase['currency']
                 purchase_to_display['value'] = purchase['value']
                 purchase_to_display['_id'] = str(purchase['_id'])
+                
+                purchase_to_display['delivery_status'] = 'No asignado' 
+                purchase_to_display['payment_status'] = 'No asignado'
+                
+                if 'delivery_id' in purchase:
+                    delivery = mongo.db.deliveries.find_one({"_id": ObjectId(purchase['delivery_id'])})
+                    purchase_to_display['delivery_status'] = delivery['status']
+                
+                if 'payment_id' in purchase:
+                    payment = mongo.db.payments.find_one({"_id": ObjectId(purchase['payment_id'])})
+                    purchase_to_display['payment_status'] = payment['status']
                 purchases.append(purchase_to_display)
             
             response_data = purchases
@@ -112,7 +123,18 @@ class MySales(Resource):
                     purchase_to_display['currency'] = purchase['currency']
                     purchase_to_display['value'] = purchase['value']
                     purchase_to_display['_id'] = str(purchase['_id'])
-                    sales.append(purchase_to_display)
+                    
+                    purchase_to_display['delivery_status'] = 'No asignado' 
+                    purchase_to_display['payment_status'] = 'No asignado'
+                    
+                    if 'delivery_id' in purchase:
+                        delivery = mongo.db.deliveries.find_one({"_id": ObjectId(purchase['delivery_id'])})
+                        purchase_to_display['delivery_status'] = delivery['status']
+                    
+                    if 'payment_id' in purchase:
+                        payment = mongo.db.payments.find_one({"_id": ObjectId(purchase['payment_id'])})
+                        purchase_to_display['payment_status'] = payment['status']
+                    purchases.append(purchase_to_display)
 
             response_data = sales
             response = responsehandler.ResponseHandler(status.HTTP_200_OK, response_data)
